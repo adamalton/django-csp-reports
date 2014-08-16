@@ -6,6 +6,16 @@ This app does not handle the setting of the [Content-Security-Policy](http://en.
 
 It is recommended that you use an app such as [django-csp](https://pypi.python.org/pypi/django_csp) ([Github](https://github.com/mozilla/django-csp)) to set the `Content-Security-Policy` headers.
 
+### So What Does This Thing Do?
+
+It receives the reports from the browser and does any/all of the following with them:
+
+* Logs them using the python `logging` module.
+* Sends them to you via email.
+* Saves them to the datbase via a Django model.
+* Runs any of your own custom functions on them.
+
+
 ### How Do I Use This Thing?
 
 1. Install this app into your Django project somehow.
