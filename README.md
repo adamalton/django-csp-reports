@@ -35,5 +35,6 @@ It receives the reports from the browser and does any/all of the following with 
 
 ### TODO
 
+* Tests.
 * Implement the `ADDITIONAL_HANDLERS` functionality so that they actually get called.
 * In `utils.save_report`, decode the JSON and pull out individual field values, then save individual values into separate fields on the `CSPReport` model so that they can be searched/displayed in the Django admin.
