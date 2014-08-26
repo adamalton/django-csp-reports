@@ -16,10 +16,19 @@ class CSPReport(models.Model):
     modified = models.DateTimeField(auto_now=True)
     json = models.TextField()
 
+    @property
+    def data(self):
+        """ Returns self.json loaded as a python object. """
+        try:
+            data = self._data
+        except AttributeError:
+            data = self._data = json.loads(self.json)
+        return data
+
     def json_as_html(self):
         """ Print out self.json in a nice way. """
         formatted_json = json.dumps(
-            json.loads(self.json), sort_keys=True,
+            self.data, sort_keys=True,
             indent=4, separators=(',', ': ')
         )
         return mark_safe(u"<pre>\n%s</pre>" % escape(formatted_json))
