@@ -1,5 +1,6 @@
 # STANDARD LIB
 import logging
+import json
 
 # LIBRARIES
 from django.conf import settings
@@ -13,34 +14,41 @@ from cspreports.models import CSPReport
 logger = logging.getLogger("CSP Reports")
 
 
-def process_report(report):
-    """ Given the raw JSON string of a CSP violation report, log it in the required ways. """
+def process_report(request):
+    """ Given the HTTP request of a CSP violation report, log it in the required ways. """
     if config.EMAIL_ADMINS:
-        email_admins(report)
+        email_admins(request)
     if config.LOG:
-        log_report(report)
+        log_report(request)
     if config.SAVE:
-        save_report(report)
+        save_report(request)
     if config.ADDITIONAL_HANDLERS:
-        run_additional_handlers(report)
+        run_additional_handlers(request)
+
+def format_report(jsn):
+    """ Given a JSON report, return a nicely formatted (i.e. with indentation) string. """
+    return json.dumps(json.loads(jsn), indent=4)
 
 
-def email_admins(report):
-    mail_admins("CSP Violation Report", report)
+def email_admins(request):
+    user_agent = request.META['HTTP_USER_AGENT']
+    report = format_report(request.body)
+    message = "User agent:\n%s\n\nReport:\n%s" % (user_agent, report)
+    mail_admins("CSP Violation Report", message)
 
 
-def log_report(report):
+def log_report(request):
     func = getattr(logger, config.LOG_LEVEL)
-    func("Content Security Policy violation: %s", report)
+    func("Content Security Policy violation: %s", format_report(request.body))
 
 
-def save_report(report):
-    CSPReport.objects.create(json=report)
+def save_report(request):
+    CSPReport.objects.create(json=request.body)
 
 
-def run_additional_handlers(report):
+def run_additional_handlers(request):
     for handler in get_additional_handlers():
-        handler(report)
+        handler(request)
 
 
 class Config(object):
