@@ -53,20 +53,19 @@ def run_additional_handlers(request):
 
 class Config(object):
     """ Configuration with defaults, each of which is overrideable in django settings. """
-    PREFIX = "CSP_REPORTS_"
 
-    # Defaults
+    # Defaults, these are overridden using "CSP_REPORTS_"-prefixed versions in settings.py
     EMAIL_ADMINS = True
     LOG = True
     LOG_LEVEL = 'warning'
     SAVE = True
     ADDITIONAL_HANDLERS = []
 
-    def __getattr__(self, name):
+    def __getattribute__(self, name):
         try:
-            return getattr(settings, "%s%s" % (self.PREFIX, name))
+            return getattr(settings, "%s%s" % ("CSP_REPORTS_", name))
         except AttributeError:
-            return getattr(self, name)
+            return super(Config, self).__getattribute__(name)
 
 
 config = Config()
@@ -75,10 +74,13 @@ _additional_handlers = None
 
 def get_additional_handlers():
     """ Returns the actual functions from the dotted paths specified in ADDITIONAL_HANDLERS. """
-    if isinstance(_additional_handlers, list):
-        return _additional_handlers
-    handlers = ()
-    for name in config.ADDITIONAL_HANDLERS:
-        module_name, function_name = name.rsplit('.', 1)
-        function = getattr(import_module(module_name), function_name)
-        handlers += (function,)
+    global _additional_handlers
+    if not isinstance(_additional_handlers, list):
+        handlers = []
+        for name in config.ADDITIONAL_HANDLERS:
+            module_name, function_name = name.rsplit('.', 1)
+            function = getattr(import_module(module_name), function_name)
+            handlers.append(function)
+        _additional_handlers = handlers
+    return _additional_handlers
+
