@@ -31,7 +31,7 @@ def format_report(jsn):
 
 
 def email_admins(request):
-    user_agent = request.META['HTTP_USER_AGENT']
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
     report = format_report(request.body)
     message = "User agent:\n%s\n\nReport:\n%s" % (user_agent, report)
     mail_admins("CSP Violation Report", message)
