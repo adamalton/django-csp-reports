@@ -32,7 +32,7 @@ def format_report(jsn):
         want to be able to display it, rather than tripping up on a ValueError.
     """
     try:
-        return json.dumps(json.loads(jsn), indent=4)
+        return json.dumps(json.loads(jsn), indent=4, sort_keys=True, separators=(',', ': '))
     except ValueError:
         return "Invalid JSON. Raw dump is below.\n\n" + jsn
 
