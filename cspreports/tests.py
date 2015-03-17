@@ -8,6 +8,7 @@ from django.test.utils import override_settings
 import mock
 
 # CSP REPORTS
+from cspreports.models import CSPReport
 from cspreports import utils
 
 
@@ -47,6 +48,21 @@ class UtilsTest(TestCase):
                             self.assertTrue(mocked_object.called)
                         else:
                             self.assertFalse(mocked_object.called)
+
+    @override_settings(
+        CSP_REPORTS_SAVE=True,
+        CSP_REPORTS_LOG=False,
+        CSP_REPORTS_EMAIL_ADMINS=False,
+    )
+    def test_save_report(self):
+        """ Test that the `save_report` handler correctly saves to the DB. """
+        assert CSPReport.objects.count() == 0 # sanity
+        request = HttpRequest()
+        request._body = '{"document-uri": "http://example.com/"}'
+        utils.process_report(request)
+        reports = list(CSPReport.objects.all())
+        self.assertEqual(len(reports), 1)
+        self.assertEqual(reports[0].json, request.body)
 
     def test_run_additional_handlers(self):
         """ Test that the run_additional_handlers function correctly calls each of the specified custom
