@@ -26,8 +26,15 @@ def process_report(request):
         run_additional_handlers(request)
 
 def format_report(jsn):
-    """ Given a JSON report, return a nicely formatted (i.e. with indentation) string. """
-    return json.dumps(json.loads(jsn), indent=4)
+    """ Given a JSON report, return a nicely formatted (i.e. with indentation) string.
+        This should handle invalid JSON (as the JSON comes from the browser/user).
+        We trust that Python's json library is secure, but if the JSON is invalid then we still
+        want to be able to display it, rather than tripping up on a ValueError.
+    """
+    try:
+        return json.dumps(json.loads(jsn), indent=4)
+    except ValueError:
+        return "Invalid JSON. Raw dump is below.\n\n" + jsn
 
 
 def email_admins(request):

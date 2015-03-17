@@ -85,6 +85,18 @@ class UtilsTest(TestCase):
             message = mock_mail_admins.call_args[0][1]
             self.assertTrue(formatted_report in message)
 
+    def test_format_report_handles_invalid_json(self):
+        """ Test that `format_report` doesn't trip up on invalid JSON.
+            Note: this is about not getting a ValueError, rather than any kind of security thing.
+        """
+        invalid_json = '{"key": undefined_variable, nonsense here}'
+        try:
+            formatted = utils.format_report(invalid_json)
+        except ValueError as e:
+            self.fail("format_report did not handle invalid JSON: %s" % e)
+        # we expect our invalid JSON to remain in the output, as is
+        self.assertTrue(invalid_json in formatted)
+
     def test_run_additional_handlers(self):
         """ Test that the run_additional_handlers function correctly calls each of the specified custom
             handler functions.
