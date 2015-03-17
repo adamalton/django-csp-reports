@@ -49,27 +49,17 @@ class UtilsTest(TestCase):
                         else:
                             self.assertFalse(mocked_object.called)
 
-    @override_settings(
-        CSP_REPORTS_SAVE=True,
-        CSP_REPORTS_LOG=False,
-        CSP_REPORTS_EMAIL_ADMINS=False,
-    )
     def test_save_report(self):
         """ Test that the `save_report` handler correctly saves to the DB. """
         assert CSPReport.objects.count() == 0 # sanity
         request = HttpRequest()
         request._body = '{"document-uri": "http://example.com/"}'
-        utils.process_report(request)
+        utils.save_report(request)
         reports = list(CSPReport.objects.all())
         self.assertEqual(len(reports), 1)
         self.assertEqual(reports[0].json, request.body)
 
-    @override_settings(
-        CSP_REPORTS_LOG=True,
-        CSP_REPORTS_LOG_LEVEL='warning',
-        CSP_REPORTS_EMAIL_ADMINS=False,
-        CSP_REPORTS_SAVE=False,
-    )
+    @override_settings(CSP_REPORTS_LOG_LEVEL='warning')
     def test_log_report(self):
         """ Test that the `log_report` handler correctly logs at the right level. """
         request = HttpRequest()
@@ -77,16 +67,11 @@ class UtilsTest(TestCase):
         formatted_report = utils.format_report(report)
         request._body = report
         with mock.patch("cspreports.utils.logger.warning") as warning_mock:
-            utils.process_report(request)
+            utils.log_report(request)
             self.assertTrue(warning_mock.called)
             log_message = warning_mock.call_args[0][0] % warning_mock.call_args[0][1:]
             self.assertTrue(formatted_report in log_message)
 
-    @override_settings(
-        CSP_REPORTS_EMAIL_ADMINS=True,
-        CSP_REPORTS_SAVE=False,
-        CSP_REPORTS_LOG=False,
-    )
     def test_email_admins(self):
         """ Test that the `email_admins` handler correctly sends an email. """
         request = HttpRequest()
@@ -95,7 +80,7 @@ class UtilsTest(TestCase):
         request._body = report
         # Note that we are mocking the *Django* mail_admins function here.
         with mock.patch("cspreports.utils.mail_admins") as mock_mail_admins:
-            utils.process_report(request)
+            utils.email_admins(request)
             self.assertTrue(mock_mail_admins.called)
             message = mock_mail_admins.call_args[0][1]
             self.assertTrue(formatted_report in message)
