@@ -12,12 +12,6 @@ from cspreports.models import CSPReport
 from cspreports import utils
 
 
-class CSPReportsTest(TestCase):
-
-    def test_custom_handler(self):
-        pass
-
-
 class UtilsTest(TestCase):
 
 
