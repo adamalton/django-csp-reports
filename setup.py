@@ -10,7 +10,7 @@ EXTRAS = {
 }
 
 setup(
-    name='CSPReports',
+    name='django-csp-reports',
     version='1.0',
     description=(
         "A Django app for handling reports from web browsers of violations of your website's "
