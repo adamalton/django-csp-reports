@@ -11,7 +11,7 @@ from django.utils.importlib import import_module
 from cspreports.models import CSPReport
 
 
-logger = logging.getLogger("CSP Reports")
+logger = logging.getLogger(getattr(settings, "CSP_REPORTS_LOGGER_NAME", "CSP Reports"))
 
 
 def process_report(request):
