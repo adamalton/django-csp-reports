@@ -1,3 +1,6 @@
+# STANDARD LIB
+import json
+
 #LIBRARIES
 from django.db import models
 from django.utils.html import escape
@@ -12,6 +15,15 @@ class CSPReport(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     json = models.TextField()
+
+    @property
+    def data(self):
+        """ Returns self.json loaded as a python object. """
+        try:
+            data = self._data
+        except AttributeError:
+            data = self._data = json.loads(self.json)
+        return data
 
     def json_as_html(self):
         """ Print out self.json in a nice way. """
