@@ -5,7 +5,7 @@ import json
 # LIBRARIES
 from django.conf import settings
 from django.core.mail import mail_admins
-from django.utils.importlib import import_module
+from importlib import import_module
 
 # CSP REPORTS
 from cspreports.models import CSPReport
