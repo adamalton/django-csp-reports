@@ -31,6 +31,8 @@ def format_report(jsn):
         We trust that Python's json library is secure, but if the JSON is invalid then we still
         want to be able to display it, rather than tripping up on a ValueError.
     """
+    if isinstance(jsn, bytes):
+        jsn = jsn.decode('utf-8')
     try:
         return json.dumps(json.loads(jsn), indent=4, sort_keys=True, separators=(',', ': '))
     except ValueError:
