@@ -1,7 +1,7 @@
 # STANDARD LIB
 import json
 
-#LIBRARIES
+# LIBRARIES
 from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -33,4 +33,3 @@ class CSPReport(models.Model):
 
         formatted_json = utils.format_report(self.json)
         return mark_safe(u"<pre>\n%s</pre>" % escape(formatted_json))
-

@@ -25,6 +25,7 @@ def process_report(request):
     if config.ADDITIONAL_HANDLERS:
         run_additional_handlers(request)
 
+
 def format_report(jsn):
     """ Given a JSON report, return a nicely formatted (i.e. with indentation) string.
         This should handle invalid JSON (as the JSON comes from the browser/user).
@@ -92,4 +93,3 @@ def get_additional_handlers():
             handlers.append(function)
         _additional_handlers = handlers
     return _additional_handlers
-

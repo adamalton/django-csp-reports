@@ -14,10 +14,11 @@ from cspreports import utils
 
 class UtilsTest(TestCase):
 
-
     def test_config(self):
-        """ Test that the various CSP_REPORTS_X settings correctly control which handlers are called. """
-        mock_paths  = [
+        """ Test that the various CSP_REPORTS_X settings correctly control which handlers are
+            called.
+        """
+        mock_paths = [
             "cspreports.utils.email_admins",
             "cspreports.utils.save_report",
             "cspreports.utils.log_report",
@@ -45,7 +46,7 @@ class UtilsTest(TestCase):
 
     def test_save_report(self):
         """ Test that the `save_report` handler correctly saves to the DB. """
-        assert CSPReport.objects.count() == 0 # sanity
+        assert CSPReport.objects.count() == 0  # sanity
         request = HttpRequest()
         request._body = '{"document-uri": "http://example.com/"}'
         utils.save_report(request)
@@ -111,4 +112,3 @@ class UtilsTest(TestCase):
 def my_handler(request):
     # just set an attribute so that we can see that this function has been called
     request.my_handler_called = True
-

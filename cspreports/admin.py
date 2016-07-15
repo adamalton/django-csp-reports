@@ -3,6 +3,7 @@ from django.contrib import admin
 # SOCKET SHARE
 from cspreports.models import CSPReport
 
+
 class CSPReportAdmin(admin.ModelAdmin):
     list_display = ('id', 'created', 'document_uri', 'blocked_uri')
     fields = ('created', 'modified', 'json_as_html')
