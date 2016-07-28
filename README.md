@@ -16,6 +16,11 @@ It receives the reports from the browser and does any/all of the following with 
 * Runs any of your own custom functions on them.
 
 
+### Supported Django Versions
+
+Supports all versions of Django (up to 1.10 at time of writing).  For Django <=1.7 you will need to use the `urls_legacy.py` file instead of `urls.py`.
+
+
 ### How Do I Use This Thing?
 
 1. Install this app into your Django project somehow.

@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 
 from cspreports.utils import process_report
 
+
 @require_POST
 @csrf_exempt
 def report_csp(request):
