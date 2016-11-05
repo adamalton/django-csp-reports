@@ -11,7 +11,7 @@ EXTRAS = {
 
 setup(
     name='django-csp-reports',
-    version='1.0',
+    version='1.1',
     description=(
         "A Django app for handling reports from web browsers of violations of your website's "
         "content security policy."
@@ -19,7 +19,7 @@ setup(
     author='Adam Alton',
     author_email='adamalton@gmail.com',
     url='https://github.com/adamalton/django-csp-reports',
-    download_url='https://github.com/adamalton/django-csp-reports/tarball/1.0',
+    download_url='https://github.com/adamalton/django-csp-reports/tarball/1.1',
     packages=PACKAGES,
     include_package_data=True,
     # dependencies
