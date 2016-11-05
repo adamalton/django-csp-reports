@@ -16,7 +16,7 @@ setup(
         "A Django app for handling reports from web browsers of violations of your website's "
         "content security policy."
     ),
-    author='Adam Alton - Potato London Ltd',
+    author='Adam Alton',
     author_email='adamalton@gmail.com',
     url='https://github.com/adamalton/django-csp-reports',
     packages=PACKAGES,
