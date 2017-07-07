@@ -53,7 +53,8 @@ def log_report(request):
 
 
 def save_report(request):
-    CSPReport.objects.create(json=request.body)
+    report = CSPReport.from_message(request.body)
+    report.save()
 
 
 def run_additional_handlers(request):

@@ -2,13 +2,34 @@
 import json
 
 # LIBRARIES
-from django.db import models
+from django.core.validators import EMPTY_VALUES
+from django.db import connection, models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 DISPOSITIONS = (
     ('enforce', 'enforce'),
     ('report', 'report'),
+)
+
+# Map of required CSP report fields to model fields
+REQUIRED_FIELD_MAP = (
+    ('document-uri', 'document_uri'),
+    ('referrer', 'referrer'),
+    ('blocked-uri', 'blocked_uri'),
+    ('violated-directive', 'violated_directive'),
+    ('original-policy', 'original_policy'),
+)
+# Map of optional (CSP >= 2.0) CSP report fields to model fields
+OPTIONAL_FIELD_MAP = (
+    ('effective-directive', 'effective_directive'),
+    ('source-file', 'source_file'),
+)
+# Map of optional report fields with integer values.
+INTEGER_FIELD_MAP = (
+    ('status-code', 'status_code'),
+    ('line-number', 'line_number'),
+    ('column-number', 'column_number'),
 )
 
 
@@ -60,6 +81,54 @@ class CSPReport(models.Model):
     line_number = models.PositiveIntegerField(blank=True, null=True)
     column_number = models.PositiveIntegerField(blank=True, null=True)
     disposition = models.CharField(max_length=10, blank=True, null=True, choices=DISPOSITIONS)
+
+    @classmethod
+    def from_message(cls, message):
+        """Creates an instance from CSP report message.
+
+        If the message is not valid, the result will still have as much fields set as possible.
+
+        @param message: JSON encoded CSP report.
+        """
+        self = cls(json=message)
+        try:
+            decoded_data = json.loads(message)
+        except ValueError:
+            # Message is not a valid JSON. Return as invalid.
+            return self
+        try:
+            report_data = decoded_data['csp-report']
+        except KeyError:
+            # Message is not a valid CSP report. Return as invalid.
+            return self
+
+        # Extract individual fields
+        for report_name, field_name in REQUIRED_FIELD_MAP + OPTIONAL_FIELD_MAP:
+            setattr(self, field_name, report_data.get(report_name))
+        # Extract integer fields
+        for report_name, field_name in INTEGER_FIELD_MAP:
+            value = report_data.get(report_name)
+            field = self._meta.get_field(field_name)
+            min_value, max_value = connection.ops.integer_field_range(field.get_internal_type())
+            # All these fields are possitive. Value can't be negative.
+            min_value = max(min_value, 0)
+            if value is not None and (min_value is None or min_value <= value) \
+                    and (max_value is None or value <= max_value):
+                setattr(self, field_name, value)
+        # Extract disposition
+        disposition = report_data.get('disposition')
+        if disposition in dict(DISPOSITIONS).keys():
+            self.disposition = disposition
+
+        # Check if report is valid
+        is_valid = True
+        for field_name in dict(REQUIRED_FIELD_MAP).values():
+            if getattr(self, field_name, None) in EMPTY_VALUES:
+                is_valid = False
+                break
+        self.is_valid = is_valid
+
+        return self
 
     @property
     def data(self):
