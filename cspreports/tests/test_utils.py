@@ -100,7 +100,7 @@ class UtilsTest(TestCase):
         utils._additional_handlers = None
         request = HttpRequest()
         with override_settings(
-            CSP_REPORTS_ADDITIONAL_HANDLERS=["cspreports.tests.my_handler"],
+            CSP_REPORTS_ADDITIONAL_HANDLERS=["cspreports.tests.test_utils.my_handler"],
             CSP_REPORTS_EMAIL_ADMINS=False,
             CSP_REPORTS_LOG=False,
             CSP_REPORTS_SAVE=False,
