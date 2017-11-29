@@ -67,6 +67,7 @@ class CSPReport(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    user_agent = models.TextField(blank=True)
     json = models.TextField()
     is_valid = models.BooleanField(default=False)
     # Individual report fields - use `TextField` because there are no limits by any specification for these fields.
