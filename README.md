@@ -37,6 +37,12 @@ Supports all versions of Django (up to 1.10 at time of writing).  For Django <=1
 6. Enjoy.
 
 
+### Commands
+
+#### `clean_cspreports`
+Deletes old reports, but keeps reports over the last week (by default).
+
+
 ### TODO
 
 * In `utils.save_report`, decode the JSON and pull out individual field values, then save individual values into separate fields on the `CSPReport` model so that they can be searched/displayed in the Django admin.
