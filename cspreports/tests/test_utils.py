@@ -3,13 +3,16 @@ from contextlib import nested
 
 # LIBRARIES
 from django.http import HttpRequest
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 import mock
 
 # CSP REPORTS
 from cspreports.models import CSPReport
 from cspreports import utils
+
+
+JSON_CONTENT_TYPE = 'application/json'
 
 
 class UtilsTest(TestCase):
@@ -47,12 +50,23 @@ class UtilsTest(TestCase):
     def test_save_report(self):
         """ Test that the `save_report` handler correctly saves to the DB. """
         assert CSPReport.objects.count() == 0  # sanity
-        request = HttpRequest()
-        request._body = '{"document-uri": "http://example.com/"}'
+        request = RequestFactory(HTTP_USER_AGENT='Agent007').post('/dummy/', '{"document-uri": "http://example.com/"}',
+                                                                  content_type=JSON_CONTENT_TYPE)
+
         utils.save_report(request)
-        reports = list(CSPReport.objects.all())
-        self.assertEqual(len(reports), 1)
+
+        reports = CSPReport.objects.all()
+        self.assertQuerysetEqual(reports.values_list('user_agent'), [('Agent007', )], transform=tuple)
         self.assertEqual(reports[0].json, request.body)
+
+    def test_save_report_no_agent(self):
+        """Test that the `save_report` handler correctly handles missing user agent header."""
+        request = RequestFactory().post('/dummy/', '{"document-uri": "http://example.com/"}',
+                                        content_type=JSON_CONTENT_TYPE)
+
+        utils.save_report(request)
+
+        self.assertQuerysetEqual(CSPReport.objects.values_list('user_agent'), [('', )], transform=tuple)
 
     @override_settings(CSP_REPORTS_LOG_LEVEL='warning')
     def test_log_report(self):

@@ -54,6 +54,7 @@ def log_report(request):
 
 def save_report(request):
     report = CSPReport.from_message(request.body)
+    report.user_agent = request.META.get('HTTP_USER_AGENT', '')
     report.save()
 
 
