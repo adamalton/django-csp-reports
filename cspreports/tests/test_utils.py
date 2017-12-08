@@ -1,5 +1,3 @@
-from contextlib import nested
-
 import mock
 from django.http import HttpRequest
 from django.test import RequestFactory, TestCase
@@ -27,14 +25,15 @@ class UtilsTest(TestCase):
             "CSP_REPORTS_SAVE",
             "CSP_REPORTS_LOG",
         ]
-        for i in xrange(len(mock_paths)):
+        for i in range(len(mock_paths)):
             mocks = [mock.patch(path) for path in mock_paths]
             settings_overrides = {
                 setting: True if j == i else False
                 for j, setting in enumerate(corresponding_settings)
             }
             with override_settings(**settings_overrides):
-                with nested(*mocks) as mocked_objects:
+                with mocks[0] as mocked_object_0, mocks[1] as mocked_object_1, mocks[2] as mocked_object_2:
+                    mocked_objects = [mocked_object_0, mocked_object_1, mocked_object_2]
                     request = HttpRequest()
                     utils.process_report(request)
                     for k, mocked_object in enumerate(mocked_objects):
@@ -46,14 +45,14 @@ class UtilsTest(TestCase):
     def test_save_report(self):
         """ Test that the `save_report` handler correctly saves to the DB. """
         assert CSPReport.objects.count() == 0  # sanity
-        request = RequestFactory(HTTP_USER_AGENT='Agent007').post('/dummy/', '{"document-uri": "http://example.com/"}',
-                                                                  content_type=JSON_CONTENT_TYPE)
+        body = '{"document-uri": "http://example.com/"}'
+        request = RequestFactory(HTTP_USER_AGENT='Agent007').post('/dummy/', body, content_type=JSON_CONTENT_TYPE)
 
         utils.save_report(request)
 
         reports = CSPReport.objects.all()
         self.assertQuerysetEqual(reports.values_list('user_agent'), [('Agent007', )], transform=tuple)
-        self.assertEqual(reports[0].json, request.body)
+        self.assertEqual(reports[0].json, body)
 
     def test_save_report_no_agent(self):
         """Test that the `save_report` handler correctly handles missing user agent header."""

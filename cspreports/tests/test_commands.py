@@ -1,11 +1,11 @@
 """Test commands."""
 from datetime import datetime
-from StringIO import StringIO
 
 from django.core.management import CommandError, call_command
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
 from mock import patch
+from six import StringIO
 
 from cspreports.management.commands.clean_cspreports import get_limit
 from cspreports.models import CSPReport

@@ -10,6 +10,7 @@ name = "pypi"
 "flake8" = "*"
 isort = "*"
 mock = "*"
+six = "*"
 
 
 [packages]
