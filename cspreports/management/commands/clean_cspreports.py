@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.dateparse import parse_date
 from django.utils.encoding import force_text
-from django.utils.timezone import localtime, make_aware
+from django.utils.timezone import localtime, make_aware, now
 
 from cspreports.models import CSPReport
 
@@ -32,7 +32,10 @@ def get_limit(value):
             limit = make_aware(limit)
         return limit
     else:
-        return localtime().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=DEFAULT_OFFSET)
+        limit = now()
+        if settings.USE_TZ:
+            limit = localtime(limit)
+        return limit.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=DEFAULT_OFFSET)
 
 
 class Command(BaseCommand):

@@ -15,15 +15,15 @@ class TestGetLimit(SimpleTestCase):
     """Test `get_limit` function."""
 
     def test_none_aware(self):
-        with self.settings(USE_TZ=True):
+        with self.settings(USE_TZ=True, TIME_ZONE='UTC'):
             mock_now = datetime(2016, 4, 27, 12, 34, tzinfo=timezone.utc)
-            with patch('cspreports.management.commands.clean_cspreports.localtime', return_value=mock_now):
+            with patch('cspreports.management.commands.clean_cspreports.now', return_value=mock_now):
                 self.assertEqual(get_limit(None), datetime(2016, 4, 20, tzinfo=timezone.utc))
 
     def test_none_naive(self):
         with self.settings(USE_TZ=False):
             mock_now = datetime(2016, 4, 27, 12, 34)
-            with patch('cspreports.management.commands.clean_cspreports.localtime', return_value=mock_now):
+            with patch('cspreports.management.commands.clean_cspreports.now', return_value=mock_now):
                 self.assertEqual(get_limit(None), datetime(2016, 4, 20))
 
     def test_input_aware(self):
