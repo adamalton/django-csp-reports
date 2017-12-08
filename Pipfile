@@ -1,0 +1,17 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[dev-packages]
+
+"flake8" = "*"
+isort = "*"
+mock = "*"
+
+
+[packages]
+
+django = ">=1.8,<1.11.99"

@@ -1,4 +1,13 @@
-.PHONY: isort check-isort check-flake8
+.PHONY: test coverage isort check-isort check-flake8
+
+test:
+	python runtests.py
+
+coverage:
+	python-coverage erase
+	-rm -r htmlcov
+	python-coverage run --branch --source="." runtests.py
+	python-coverage html -d htmlcov
 
 isort:
 	isort --recursive cspreports

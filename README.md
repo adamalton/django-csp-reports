@@ -18,7 +18,7 @@ It receives the reports from the browser and does any/all of the following with 
 
 ### Supported Django Versions
 
-Supports all versions of Django (up to 1.10 at time of writing).  For Django <=1.7 you will need to use the `urls_legacy.py` file instead of `urls.py`.
+Supports Django 1.8 to 1.11.
 
 
 ### How Do I Use This Thing?

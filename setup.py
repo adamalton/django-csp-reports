@@ -1,13 +1,9 @@
 #!/usr/bin/env python
-
-from distutils.core import setup
-from setuptools import find_packages
+from setuptools import find_packages, setup
 
 PACKAGES = find_packages()
-
-EXTRAS = {
-    "test": ["mock"],
-}
+REQUIREMENTS = ['django >=1.8,<1.11.99']
+TEST_REQUIREMENTS = ['mock']
 
 setup(
     name='django-csp-reports',
@@ -22,9 +18,10 @@ setup(
     download_url='https://github.com/adamalton/django-csp-reports/tarball/1.1',
     packages=PACKAGES,
     include_package_data=True,
-    # dependencies
-    extras_require=EXTRAS,
-    tests_require=EXTRAS['test'],
+    python_requires='>=2.7,<3',
+    install_requires=REQUIREMENTS,
+    tests_require=TEST_REQUIREMENTS,
+    test_suite='runtests.runtests',
     keywords=['django', 'csp', 'content security policy'],
-    classifiers=['License :: OSI Approved :: MIT License', 'Framework :: Django']
-    )
+    classifiers=['License :: OSI Approved :: MIT License', 'Framework :: Django'],
+)
