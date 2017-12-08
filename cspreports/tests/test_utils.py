@@ -1,16 +1,12 @@
-# STANDARD LIB
 from contextlib import nested
 
-# LIBRARIES
+import mock
 from django.http import HttpRequest
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
-import mock
 
-# CSP REPORTS
-from cspreports.models import CSPReport
 from cspreports import utils
-
+from cspreports.models import CSPReport
 
 JSON_CONTENT_TYPE = 'application/json'
 

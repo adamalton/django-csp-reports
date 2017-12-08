@@ -1,12 +1,13 @@
 """Command to clean old CSP reports."""
 from datetime import datetime, timedelta
 
-from cspreports.models import CSPReport
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.dateparse import parse_date
 from django.utils.encoding import force_text
-from django.utils.timezone import get_current_timezone, localtime, make_aware
+from django.utils.timezone import localtime, make_aware
+
+from cspreports.models import CSPReport
 
 DEFAULT_OFFSET = 7
 
