@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import json
 import logging
 from importlib import import_module

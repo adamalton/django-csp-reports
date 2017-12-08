@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import mock
 from django.http import HttpRequest
 from django.test import RequestFactory, TestCase

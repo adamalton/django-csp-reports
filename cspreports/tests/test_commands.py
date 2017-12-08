@@ -1,4 +1,6 @@
 """Test commands."""
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.core.management import CommandError, call_command

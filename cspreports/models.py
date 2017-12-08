@@ -1,4 +1,6 @@
 # STANDARD LIB
+from __future__ import unicode_literals
+
 import json
 
 # LIBRARIES
@@ -149,4 +151,4 @@ class CSPReport(models.Model):
         from cspreports import utils
 
         formatted_json = utils.format_report(self.json)
-        return mark_safe(u"<pre>\n%s</pre>" % escape(formatted_json))
+        return mark_safe("<pre>\n%s</pre>" % escape(formatted_json))
