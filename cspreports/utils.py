@@ -1,15 +1,11 @@
-# STANDARD LIB
-import logging
 import json
-
-# LIBRARIES
-from django.conf import settings
-from django.core.mail import mail_admins
+import logging
 from importlib import import_module
 
-# CSP REPORTS
-from cspreports.models import CSPReport
+from django.conf import settings
+from django.core.mail import mail_admins
 
+from cspreports.models import CSPReport
 
 logger = logging.getLogger(getattr(settings, "CSP_REPORTS_LOGGER_NAME", "CSP Reports"))
 

@@ -1,0 +1,14 @@
+language: python
+sudo: false
+python:
+  - "2.7"
+env:
+  - TOX_ENV=quality
+  - TOX_ENV=py27-18
+  - TOX_ENV=py27-19
+  - TOX_ENV=py27-110
+  - TOX_ENV=py27-111
+install:
+  - pip install tox
+script:
+  - tox -e $TOX_ENV

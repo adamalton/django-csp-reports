@@ -1,6 +1,5 @@
 from django.contrib import admin
 
-# SOCKET SHARE
 from cspreports.models import CSPReport
 
 
@@ -20,5 +19,6 @@ class CSPReportAdmin(admin.ModelAdmin):
 
     json_as_html.short_description = "Report"
     json_as_html.allow_tags = True
+
 
 admin.site.register(CSPReport, CSPReportAdmin)
