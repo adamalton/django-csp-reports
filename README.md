@@ -1,5 +1,7 @@
 # Django Content Security Policy Reports
 
+[![Build Status](https://travis-ci.org/adamalton/django-csp-reports.svg)](https://travis-ci.org/adamalton/django-csp-reports)
+
 A [Django](https://www.djangoproject.com) app for handling reports from web browsers of violations of your website's content security policy.
 
 This app does not handle the setting of the [Content-Security-Policy](http://en.wikipedia.org/wiki/Content_Security_Policy) HTTP headers, but deals with handling the reports that web browsers may submit to your site (via the `report-uri`) when the stated content security policy is violated.
