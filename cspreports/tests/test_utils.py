@@ -1,12 +1,17 @@
 from __future__ import unicode_literals
 
+from datetime import datetime
+
 import mock
 from django.http import HttpRequest
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import override_settings
+from django.utils import timezone
+from mock import patch
 
 from cspreports import utils
 from cspreports.models import CSPReport
+from cspreports.utils import get_midnight, parse_date_input
 
 JSON_CONTENT_TYPE = 'application/json'
 
@@ -123,3 +128,40 @@ class UtilsTest(TestCase):
 def my_handler(request):
     # just set an attribute so that we can see that this function has been called
     request.my_handler_called = True
+
+
+class TestParseDateInput(SimpleTestCase):
+    """Test `parse_date_input` function."""
+
+    def test_aware(self):
+        with self.settings(USE_TZ=True, TIME_ZONE='Europe/Prague'):
+            self.assertEqual(parse_date_input('2016-05-25'), timezone.make_aware(datetime(2016, 5, 25)))
+
+    def test_naive(self):
+        with self.settings(USE_TZ=False):
+            self.assertEqual(parse_date_input('2016-05-25'), datetime(2016, 5, 25))
+
+    def test_invalid_date(self):
+        with self.assertRaisesMessage(ValueError, 'is not a valid date.'):
+            parse_date_input('2016-13-25')
+
+    def test_invalid_input(self):
+        with self.assertRaisesMessage(ValueError, 'is not a valid date.'):
+            parse_date_input('INVALID')
+
+
+class TestGetMidnight(SimpleTestCase):
+    """Test `get_midnight` function."""
+
+    def test_aware(self):
+        with self.settings(USE_TZ=True, TIME_ZONE='Europe/Prague'):
+            # 00:05 in CEST is 22:05 day before in UTC
+            mock_now = datetime(2016, 4, 27, 0, 5, tzinfo=timezone.get_current_timezone())
+            with patch('cspreports.utils.now', return_value=mock_now):
+                self.assertEqual(get_midnight(), datetime(2016, 4, 26, 22, 0, tzinfo=timezone.utc))
+
+    def test_naive(self):
+        with self.settings(USE_TZ=False):
+            mock_now = datetime(2016, 4, 27, 12, 34)
+            with patch('cspreports.utils.now', return_value=mock_now):
+                self.assertEqual(get_midnight(), datetime(2016, 4, 27))

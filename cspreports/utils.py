@@ -2,10 +2,13 @@ from __future__ import unicode_literals
 
 import json
 import logging
+from datetime import datetime
 from importlib import import_module
 
 from django.conf import settings
 from django.core.mail import mail_admins
+from django.utils.dateparse import parse_date
+from django.utils.timezone import localtime, make_aware, now
 
 from cspreports.models import CSPReport
 
@@ -93,3 +96,34 @@ def get_additional_handlers():
             handlers.append(function)
         _additional_handlers = handlers
     return _additional_handlers
+
+
+def parse_date_input(value):
+    """Return datetime based on the user's input.
+
+    @param value: User's input
+    @type value: str
+    @raise ValueError: If the input is not valid.
+    @return: Datetime of the beginning of the user's date.
+    """
+    try:
+        limit = parse_date(value)
+    except ValueError:
+        limit = None
+    if limit is None:
+        raise ValueError("'{}' is not a valid date.".format(value))
+    limit = datetime(limit.year, limit.month, limit.day)
+    if settings.USE_TZ:
+        limit = make_aware(limit)
+    return limit
+
+
+def get_midnight():
+    """Return last midnight in localtime as datetime.
+
+    @return: Midnight datetime
+    """
+    limit = now()
+    if settings.USE_TZ:
+        limit = localtime(limit)
+    return limit.replace(hour=0, minute=0, second=0, microsecond=0)
