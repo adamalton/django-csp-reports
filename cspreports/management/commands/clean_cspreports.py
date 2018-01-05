@@ -1,4 +1,6 @@
 """Command to clean old CSP reports."""
+from __future__ import unicode_literals
+
 from datetime import datetime, timedelta
 
 from django.conf import settings

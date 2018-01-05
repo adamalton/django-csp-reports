@@ -1,4 +1,6 @@
 # STANDARD LIB
+from __future__ import unicode_literals
+
 import json
 
 # LIBRARIES
@@ -90,6 +92,7 @@ class CSPReport(models.Model):
         If the message is not valid, the result will still have as much fields set as possible.
 
         @param message: JSON encoded CSP report.
+        @type message: text
         """
         self = cls(json=message)
         try:
@@ -111,10 +114,11 @@ class CSPReport(models.Model):
             value = report_data.get(report_name)
             field = self._meta.get_field(field_name)
             min_value, max_value = connection.ops.integer_field_range(field.get_internal_type())
+            if min_value is None:
+                min_value = 0
             # All these fields are possitive. Value can't be negative.
             min_value = max(min_value, 0)
-            if value is not None and (min_value is None or min_value <= value) \
-                    and (max_value is None or value <= max_value):
+            if value is not None and min_value <= value and (max_value is None or value <= max_value):
                 setattr(self, field_name, value)
         # Extract disposition
         disposition = report_data.get('disposition')
@@ -147,4 +151,4 @@ class CSPReport(models.Model):
         from cspreports import utils
 
         formatted_json = utils.format_report(self.json)
-        return mark_safe(u"<pre>\n%s</pre>" % escape(formatted_json))
+        return mark_safe("<pre>\n%s</pre>" % escape(formatted_json))

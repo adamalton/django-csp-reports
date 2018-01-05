@@ -1,4 +1,6 @@
 """Test for `cspreports.models`."""
+from __future__ import unicode_literals
+
 import json
 
 from django.test import SimpleTestCase

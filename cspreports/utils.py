@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import json
 import logging
 from importlib import import_module
@@ -49,7 +51,7 @@ def log_report(request):
 
 
 def save_report(request):
-    report = CSPReport.from_message(request.body)
+    report = CSPReport.from_message(request.body.decode(request.encoding or settings.DEFAULT_CHARSET))
     report.user_agent = request.META.get('HTTP_USER_AGENT', '')
     report.save()
 
