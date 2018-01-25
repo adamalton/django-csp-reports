@@ -87,6 +87,25 @@ class TestFromMessage(SimpleTestCase):
         self.assertEqual(report.source_file, 'nasty-script.js')
         self.assertIsNone(report.effective_directive)
 
+    def test_valid_empty_fields(self):
+        # Test valid CSP report according to CSP 1.0 with some fields with empty values
+        data = {'csp-report': {'document-uri': 'http://protected.example.cz/',
+                               'referrer': '',
+                               'blocked-uri': '',
+                               'violated-directive': 'Very protective directive.',
+                               'original-policy': 'Nothing is allowed.'}}
+        message = json.dumps(data)
+        report = CSPReport.from_message(message)
+
+        self.assertTrue(report.is_valid)
+        self.assertEqual(report.json, message)
+        self.assertEqual(report.document_uri, 'http://protected.example.cz/')
+        self.assertEqual(report.referrer, '')
+        self.assertEqual(report.blocked_uri, '')
+        self.assertEqual(report.violated_directive, 'Very protective directive.')
+        self.assertEqual(report.original_policy, 'Nothing is allowed.')
+        self.assertIsNone(report.effective_directive)
+
     def test_valid_line_number(self):
         # Test valid line number is extracted.
         data = {'csp-report': {'document-uri': 'http://protected.example.cz/',
