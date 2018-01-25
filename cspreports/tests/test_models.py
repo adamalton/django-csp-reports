@@ -4,8 +4,35 @@ from __future__ import unicode_literals
 import json
 
 from django.test import SimpleTestCase
+from django.utils.six import text_type
 
 from cspreports.models import CSPReport
+
+
+class TestCSPReport(SimpleTestCase):
+    """Basic tests of CSP report model."""
+
+    def test_nice_report_empty(self):
+        self.assertEqual(CSPReport(json=None).nice_report, '[no CSP report data]')
+        self.assertEqual(CSPReport(json='').nice_report, '[no CSP report data]')
+
+    def test_nice_report_invalid_json(self):
+        self.assertEqual(CSPReport(json='Not a JSON').nice_report, "Invalid CSP report: 'Not a JSON'")
+
+    def test_nice_report_invalid_report(self):
+        self.assertEqual(CSPReport(json=json.dumps({})).nice_report, "Invalid CSP report: {}")
+        self.assertEqual(CSPReport(json=json.dumps({'key': 'value'})).nice_report,
+                         'Invalid CSP report: {\n    "key": "value"\n}')
+
+    def test_nice_report(self):
+        self.assertJSONEqual(CSPReport(json=json.dumps({'csp-report': {}})).nice_report, {})
+        self.assertJSONEqual(CSPReport(json=json.dumps({'csp-report': {'key': 'value'}})).nice_report, {'key': 'value'})
+
+    def test_text_representation(self):
+        self.assertEqual(text_type(CSPReport(json='')), '[no CSP report data]')
+        self.assertEqual(text_type(CSPReport(json='Not a JSON')), "Invalid CSP report: 'Not a JSON'")
+        self.assertJSONEqual(text_type(CSPReport(json=json.dumps({'csp-report': {}}))), {})
+        self.assertJSONEqual(text_type(CSPReport(json=json.dumps({'csp-report': {'key': 'value'}}))), {'key': 'value'})
 
 
 class TestFromMessage(SimpleTestCase):

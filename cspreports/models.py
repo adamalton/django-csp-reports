@@ -83,6 +83,22 @@ class CSPReport(models.Model):
     column_number = models.PositiveIntegerField(blank=True, null=True)
     disposition = models.CharField(max_length=10, blank=True, null=True, choices=DISPOSITIONS)
 
+    @property
+    def nice_report(self):
+        """Return a nicely formatted original report."""
+        if not self.json:
+            return '[no CSP report data]'
+        try:
+            data = json.loads(self.json)
+        except ValueError:
+            return "Invalid CSP report: '{}'".format(self.json)
+        if 'csp-report' not in data:
+            return 'Invalid CSP report: ' + json.dumps(data, indent=4, sort_keys=True, separators=(',', ': '))
+        return json.dumps(data['csp-report'], indent=4, sort_keys=True, separators=(',', ': '))
+
+    def __str__(self):
+        return self.nice_report
+
     @classmethod
     def from_message(cls, message):
         """Creates an instance from CSP report message.
