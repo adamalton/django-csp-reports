@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 
 import json
 
-# LIBRARIES
-from django.core.validators import EMPTY_VALUES
 from django.db import connection, models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -128,7 +126,7 @@ class CSPReport(models.Model):
         # Check if report is valid
         is_valid = True
         for field_name in dict(REQUIRED_FIELD_MAP).values():
-            if getattr(self, field_name, None) in EMPTY_VALUES:
+            if getattr(self, field_name) is None:
                 is_valid = False
                 break
         self.is_valid = is_valid
