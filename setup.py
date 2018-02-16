@@ -4,6 +4,10 @@ from setuptools import find_packages, setup
 PACKAGES = find_packages()
 REQUIREMENTS = ['django >=1.8,<1.11.99']
 TEST_REQUIREMENTS = ['mock', 'six']
+EXTRAS_REQUIRE = {
+    'quality': ['isort', 'flake8'],
+    'test': TEST_REQUIREMENTS,
+}
 CLASSIFIERS = ['License :: OSI Approved :: MIT License',
                'Framework :: Django',
                'Programming Language :: Python',
@@ -30,6 +34,7 @@ setup(
     python_requires='>=2.7',
     install_requires=REQUIREMENTS,
     tests_require=TEST_REQUIREMENTS,
+    extras_require=EXTRAS_REQUIRE,
     test_suite='runtests.runtests',
     keywords=['django', 'csp', 'content security policy'],
     classifiers=CLASSIFIERS,
