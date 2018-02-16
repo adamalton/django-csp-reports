@@ -11,6 +11,8 @@ from six import StringIO
 
 from cspreports.models import CSPReport
 
+from .utils import create_csp_report
+
 
 class TestCleanCspreports(TestCase):
     """Test `clean_cspreports` command."""
@@ -48,3 +50,34 @@ class TestCleanCspreports(TestCase):
         # Test invalid limit input
         with self.assertRaisesMessage(CommandError, "'JUNK' is not a valid date."):
             call_command('clean_cspreports', 'JUNK')
+
+
+class TestMakeCspSummary(TestCase):
+    """Test `make_csp_summary` command."""
+
+    def test_empty(self):
+        buff = StringIO()
+        call_command('make_csp_summary', stdout=buff)
+        self.assertIn('CSP report summary', buff.getvalue())
+
+    def test_report(self):
+        create_csp_report(datetime(1970, 1, 1, 12), is_valid=True, document_uri='http://example.cz/',
+                          blocked_uri='http://example.evil/')
+        buff = StringIO()
+
+        call_command('make_csp_summary', stdout=buff, since='1970-01-01')
+
+        self.assertIn('CSP report summary', buff.getvalue())
+        self.assertIn('Violation sources', buff.getvalue())
+        self.assertIn('Blocked URIs', buff.getvalue())
+        self.assertIn('http://example.evil/', buff.getvalue())
+
+    def test_invalid_since(self):
+        # Test invalid since value
+        with self.assertRaisesMessage(CommandError, "'JUNK' is not a valid date."):
+            call_command('make_csp_summary', since='JUNK')
+
+    def test_invalid_to(self):
+        # Test invalid since to
+        with self.assertRaisesMessage(CommandError, "'JUNK' is not a valid date."):
+            call_command('make_csp_summary', to='JUNK')

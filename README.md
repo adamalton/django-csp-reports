@@ -16,6 +16,7 @@ It receives the reports from the browser and does any/all of the following with 
 * Sends them to you via email.
 * Saves them to the datbase via a Django model.
 * Runs any of your own custom functions on them.
+* Can generate a summary of a reports.
 
 
 ### Supported Django Versions
@@ -36,10 +37,14 @@ Supports Python 2.7, 3.4 to 3.7 and Django 1.8 to 1.11.
     * `CSP_REPORTS_SAVE` (`bool` defaults to `True`).  Determines whether the reports are saved to the database.
     * `CSP_REPORTS_ADDITIONAL_HANDLERS` (`iterable` defaults to `[]`). Each value should be a dot-separated string path to a function which you want be called when a report is received. Each function is passed the `HttpRequest` of the CSP report.
     * `CSP_REPORTS_LOGGER_NAME` (`str` defaults to `CSP Reports`). Specifies the logger name that will be used for logging CSP reports, if enabled.
-6. Enjoy.
+6. Set a cron to generate summaries.
+7. Enjoy.
 
 
 ### Commands
 
 #### `clean_cspreports`
 Deletes old reports, but keeps reports over the last week (by default).
+
+#### `make_csp_summary`
+Generates a summary of CSP reports over the yesterday (by default).
