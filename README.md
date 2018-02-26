@@ -21,7 +21,7 @@ It receives the reports from the browser and does any/all of the following with 
 
 ### Supported Django Versions
 
-Supports Python 2.7, 3.4 to 3.7 and Django 1.8 to 1.11.
+Supports Python 2.7, 3.4 to 3.7 and Django 1.8 to 2.0.
 
 
 ### How Do I Use This Thing?
