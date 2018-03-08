@@ -156,7 +156,7 @@ class TestGetMidnight(SimpleTestCase):
     def test_aware(self):
         with self.settings(USE_TZ=True, TIME_ZONE='Europe/Prague'):
             # 00:05 in CEST is 22:05 day before in UTC
-            mock_now = datetime(2016, 4, 27, 0, 5, tzinfo=timezone.get_current_timezone())
+            mock_now = datetime(2016, 4, 26, 22, 5, tzinfo=timezone.utc)
             with patch('cspreports.utils.now', return_value=mock_now):
                 self.assertEqual(get_midnight(), datetime(2016, 4, 26, 22, 0, tzinfo=timezone.utc))
 
