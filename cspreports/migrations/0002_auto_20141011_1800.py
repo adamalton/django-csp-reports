@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='cspreport',
-            options={'ordering': (b'-created',)},
+            options={'ordering': ('-created',)},
         ),
     ]

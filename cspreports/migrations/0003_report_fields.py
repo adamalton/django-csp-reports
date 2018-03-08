@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='cspreport',
             name='disposition',
-            field=models.CharField(blank=True, choices=[(b'enforce', b'enforce'), (b'report', b'report')], max_length=10, null=True),
+            field=models.CharField(blank=True, choices=[('enforce', 'enforce'), ('report', 'report')], max_length=10, null=True),
         ),
         migrations.AddField(
             model_name='cspreport',
