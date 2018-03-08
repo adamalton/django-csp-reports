@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 PACKAGES = find_packages()
 REQUIREMENTS = ['django >=1.8,<2.0.99', 'six']
-TEST_REQUIREMENTS = ['mock']
+TEST_REQUIREMENTS = ['mock', 'coverage']
 EXTRAS_REQUIRE = {
     'quality': ['isort', 'flake8'],
     'test': TEST_REQUIREMENTS,
