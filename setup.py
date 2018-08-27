@@ -18,13 +18,17 @@ CLASSIFIERS = ['License :: OSI Approved :: MIT License',
                'Programming Language :: Python :: 3.5',
                'Programming Language :: Python :: 3.6']
 
+
+DESCRIPTION = (
+    "A Django app for handling reports from web browsers of violations of your website's "
+    "HTTP Content Security Policy."
+)
+
 setup(
     name='django-csp-reports',
     version='1.1',
-    description=(
-        "A Django app for handling reports from web browsers of violations of your website's "
-        "content security policy."
-    ),
+    description=DESCRIPTION,
+    long_description=DESCRIPTION,
     author='Adam Alton',
     author_email='adamalton@gmail.com',
     url='https://github.com/adamalton/django-csp-reports',
