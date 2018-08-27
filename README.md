@@ -44,7 +44,22 @@ Supports Python 2.7, 3.4 to 3.7 and Django 1.8 to 2.0.
 ### Commands
 
 #### `clean_cspreports`
-Deletes old reports, but keeps reports over the last week (by default).
+Deletes old reports from the database.
+
+Options:
+
+* `--limit` - timestamp that all reports created since will not be deleted. Defaults to 1 week. Accepts any string that can be parsed as a datetime.
 
 #### `make_csp_summary`
-Generates a summary of CSP reports over the yesterday (by default).
+Generates a summary of CSP reports.
+
+By default includes reports from yesterday (00:00:00 to midnight).
+The summary shows the top 10 violation sources (i.e. pages from which violations were reported),
+the top 10 blocked URIs (banned resources which the pages tried to load),
+and the top 10 invalid reports (which the browser provided an invalid CSP report).
+
+Options:
+
+* `--since` - timestamp of the oldest reports to include.  Accepts any string that can be parsed as a datetime.
+* `--to` - timestamp of the newest reports to include.  Accepts any string that can be parsed as a datetime.
+* `--top` - limit of how many examples to show. Default is 10.
