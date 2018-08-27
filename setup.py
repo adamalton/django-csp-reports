@@ -26,7 +26,7 @@ DESCRIPTION = (
 
 setup(
     name='django-csp-reports',
-    version='1.1',
+    version='1.2',
     description=DESCRIPTION,
     long_description=DESCRIPTION,
     author='Adam Alton',
