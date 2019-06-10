@@ -2,7 +2,7 @@
 from setuptools import find_packages, setup
 
 PACKAGES = find_packages()
-REQUIREMENTS = ['django >=1.8,<2.0.99', 'six']
+REQUIREMENTS = ['django >=1.8,<2.3', 'six']
 TEST_REQUIREMENTS = ['mock', 'coverage']
 EXTRAS_REQUIRE = {
     'quality': ['isort', 'flake8'],
@@ -26,13 +26,13 @@ DESCRIPTION = (
 
 setup(
     name='django-csp-reports',
-    version='1.2',
+    version='1.3',
     description=DESCRIPTION,
     long_description=DESCRIPTION,
     author='Adam Alton',
     author_email='adamalton@gmail.com',
     url='https://github.com/adamalton/django-csp-reports',
-    download_url='https://github.com/adamalton/django-csp-reports/tarball/1.1',
+    download_url='https://github.com/adamalton/django-csp-reports/tarball/1.3',
     packages=PACKAGES,
     include_package_data=True,
     python_requires='>=2.7',
