@@ -14,7 +14,7 @@ It receives the reports from the browser and does any/all of the following with 
 
 * Logs them using the python `logging` module.
 * Sends them to you via email.
-* Saves them to the datbase via a Django model.
+* Saves them to the database via a Django model.
 * Runs any of your own custom functions on them.
 * Can generate a summary of a reports.
 
@@ -27,7 +27,7 @@ Supports Python 2.7, 3.5 to 3.7 and Django 1.8 to 2.2.
 ### How Do I Use This Thing?
 
 1. Install this app into your Django project somehow.
-2. Add 'cspreports' to your `INSTALLED_APPS`.
+2. Add `'cspreports'` to your `INSTALLED_APPS`.
 3. Include `cspreports.urls` in your URL config somewhere.
 4. In your `Content-Security-Policy` HTTP headers, set `reverse('report_csp')` as the `report-uri`.  (Note, with django-csp, you will want to set `CSP_REPORT_URI = reverse_lazy('report_csp')` in settings.py).
 5. Set all/any of the following into settings.py as you so desire, hopefully they are self-explanatory:
