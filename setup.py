@@ -2,7 +2,7 @@
 from setuptools import find_packages, setup
 
 PACKAGES = find_packages()
-REQUIREMENTS = ['django >=1.8,<2.3', 'six']
+REQUIREMENTS = ['django >=1.11,<4.0', 'six']
 TEST_REQUIREMENTS = ['mock', 'coverage']
 EXTRAS_REQUIRE = {
     'quality': ['isort', 'flake8'],
@@ -16,7 +16,9 @@ CLASSIFIERS = ['License :: OSI Approved :: MIT License',
                'Programming Language :: Python :: 3',
                'Programming Language :: Python :: 3.4',
                'Programming Language :: Python :: 3.5',
-               'Programming Language :: Python :: 3.6']
+               'Programming Language :: Python :: 3.6',
+               'Programming Language :: Python :: 3.7',
+               'Programming Language :: Python :: 3.8']
 
 
 DESCRIPTION = (
