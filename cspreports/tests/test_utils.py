@@ -124,6 +124,22 @@ class UtilsTest(TestCase):
             utils.process_report(request)
             self.assertTrue(request.my_handler_called)
 
+    @override_settings(CSP_REPORTS_IGNORE_BROWSER_EXTENSIONS=True)
+    def test_ignore_browser_extensions(self):
+        """ Test that setting CSP_REPORTS_IGNORE_BROWSER_EXTENSIONS to True causes reports
+            triggered by browser extensions injecting resources to be ignored.
+        """
+        report1 = '{"document-uri": "http://example.com/", "source-file": "moz-extension://x.js"}'
+        report2 = '{"document-uri": "http://example.com/"}'
+        request = HttpRequest()
+        request._body = report1
+        with mock.patch('cspreports.utils.log_report') as log_patch:
+            utils.process_report(request)
+            self.assertFalse(log_patch.called)
+            request._body = report2
+            utils.process_report(request)
+            self.assertTrue(log_patch.called)
+
 
 def my_handler(request):
     # just set an attribute so that we can see that this function has been called

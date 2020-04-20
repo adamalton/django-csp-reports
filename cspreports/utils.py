@@ -17,6 +17,8 @@ logger = logging.getLogger(getattr(settings, "CSP_REPORTS_LOGGER_NAME", "CSP Rep
 
 def process_report(request):
     """ Given the HTTP request of a CSP violation report, log it in the required ways. """
+    if should_ignore_report(request):
+        return
     if config.EMAIL_ADMINS:
         email_admins(request)
     if config.LOG:
@@ -73,6 +75,7 @@ class Config(object):
     LOG_LEVEL = 'warning'
     SAVE = True
     ADDITIONAL_HANDLERS = []
+    IGNORE_BROWSER_EXTENSIONS = False
 
     def __getattribute__(self, name):
         try:
@@ -127,3 +130,16 @@ def get_midnight():
     if settings.USE_TZ:
         limit = localtime(limit)
     return limit.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def should_ignore_report(request):
+    if not config.IGNORE_BROWSER_EXTENSIONS:
+        return False
+    json_str = request.body
+    if isinstance(json_str, bytes):
+        json_str = json_str.decode('utf-8')
+    report = json.loads(json_str)
+    src_file = report.get('source-file', '')
+    if src_file.startswith('moz-extension://'):
+        return True
+    return False
