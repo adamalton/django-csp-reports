@@ -28,13 +28,13 @@ DESCRIPTION = (
 
 setup(
     name='django-csp-reports',
-    version='1.3',
+    version='1.4',
     description=DESCRIPTION,
     long_description=DESCRIPTION,
     author='Adam Alton',
     author_email='adamalton@gmail.com',
     url='https://github.com/adamalton/django-csp-reports',
-    download_url='https://github.com/adamalton/django-csp-reports/tarball/1.3',
+    download_url='https://github.com/adamalton/django-csp-reports/tarball/1.4',
     packages=PACKAGES,
     include_package_data=True,
     python_requires='>=2.7',
