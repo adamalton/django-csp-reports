@@ -17,6 +17,8 @@ logger = logging.getLogger(getattr(settings, "CSP_REPORTS_LOGGER_NAME", "CSP Rep
 
 def process_report(request):
     """ Given the HTTP request of a CSP violation report, log it in the required ways. """
+    if not should_process_report(request):
+        return
     if config.EMAIL_ADMINS:
         email_admins(request)
     if config.LOG:
@@ -54,7 +56,10 @@ def log_report(request):
 
 
 def save_report(request):
-    report = CSPReport.from_message(request.body.decode(request.encoding or settings.DEFAULT_CHARSET))
+    message = request.body
+    if isinstance(message, bytes):
+        message = message.decode(request.encoding or settings.DEFAULT_CHARSET)
+    report = CSPReport.from_message(message)
     report.user_agent = request.META.get('HTTP_USER_AGENT', '')
     report.save()
 
@@ -73,6 +78,7 @@ class Config(object):
     LOG_LEVEL = 'warning'
     SAVE = True
     ADDITIONAL_HANDLERS = []
+    FILTER_FUNCTION = None
 
     def __getattribute__(self, name):
         try:
@@ -83,6 +89,7 @@ class Config(object):
 
 config = Config()
 _additional_handlers = None
+_filter_function = None
 
 
 def get_additional_handlers():
@@ -91,8 +98,7 @@ def get_additional_handlers():
     if not isinstance(_additional_handlers, list):
         handlers = []
         for name in config.ADDITIONAL_HANDLERS:
-            module_name, function_name = name.rsplit('.', 1)
-            function = getattr(import_module(module_name), function_name)
+            function = import_from_dotted_path(name)
             handlers.append(function)
         _additional_handlers = handlers
     return _additional_handlers
@@ -127,3 +133,17 @@ def get_midnight():
     if settings.USE_TZ:
         limit = localtime(limit)
     return limit.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def import_from_dotted_path(name):
+    module_name, function_name = name.rsplit('.', 1)
+    return getattr(import_module(module_name), function_name)
+
+
+def should_process_report(request):
+    if not config.FILTER_FUNCTION:
+        return True
+    global _filter_function
+    if _filter_function is None:
+        _filter_function = import_from_dotted_path(config.FILTER_FUNCTION)
+    return _filter_function(request)

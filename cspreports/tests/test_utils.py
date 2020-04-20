@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import json
 from datetime import datetime
 
 import mock
@@ -124,10 +125,35 @@ class UtilsTest(TestCase):
             utils.process_report(request)
             self.assertTrue(request.my_handler_called)
 
+    @override_settings(CSP_REPORTS_FILTER_FUNCTION='cspreports.tests.test_utils.example_filter')
+    def test_filter_function(self):
+        """ Test that setting CSP_REPORTS_FILTER_FUNCTION allows the given function to filter out
+            requests.
+        """
+        report1 = '{"document-uri": "http://not-included.com/"}'
+        report2 = '{"document-uri": "http://included.com/"}'
+        request = HttpRequest()
+        request._body = report1
+        with mock.patch('cspreports.utils.log_report') as log_patch:
+            utils.process_report(request)
+            self.assertFalse(log_patch.called)
+            request._body = report2
+            utils.process_report(request)
+            self.assertTrue(log_patch.called)
+
 
 def my_handler(request):
     # just set an attribute so that we can see that this function has been called
     request.my_handler_called = True
+
+
+def example_filter(request):
+    """ Filters out reports with a 'document-uri' not from included.com. """
+    report = json.loads(request.body)
+    doc_uri = report.get('document-uri', '')
+    if doc_uri.startswith('http://included.com'):
+        return True
+    return False
 
 
 class TestParseDateInput(SimpleTestCase):

@@ -4,9 +4,13 @@ from __future__ import unicode_literals
 import json
 
 from django.test import SimpleTestCase
-from django.utils.six import text_type
 
 from cspreports.models import CSPReport
+
+try:
+    from django.utils.six import text_type
+except ImportError:
+    text_type = str
 
 
 class TestCSPReport(SimpleTestCase):
