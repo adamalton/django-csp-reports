@@ -17,7 +17,7 @@ logger = logging.getLogger(getattr(settings, "CSP_REPORTS_LOGGER_NAME", "CSP Rep
 
 def process_report(request):
     """ Given the HTTP request of a CSP violation report, log it in the required ways. """
-    if should_ignore_report(request):
+    if not should_process_report(request):
         return
     if config.EMAIL_ADMINS:
         email_admins(request)
@@ -78,7 +78,7 @@ class Config(object):
     LOG_LEVEL = 'warning'
     SAVE = True
     ADDITIONAL_HANDLERS = []
-    IGNORE_BROWSER_EXTENSIONS = False
+    FILTER_FUNCTION = None
 
     def __getattribute__(self, name):
         try:
@@ -89,6 +89,7 @@ class Config(object):
 
 config = Config()
 _additional_handlers = None
+_filter_function = None
 
 
 def get_additional_handlers():
@@ -97,8 +98,7 @@ def get_additional_handlers():
     if not isinstance(_additional_handlers, list):
         handlers = []
         for name in config.ADDITIONAL_HANDLERS:
-            module_name, function_name = name.rsplit('.', 1)
-            function = getattr(import_module(module_name), function_name)
+            function = import_from_dotted_path(name)
             handlers.append(function)
         _additional_handlers = handlers
     return _additional_handlers
@@ -135,14 +135,15 @@ def get_midnight():
     return limit.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
-def should_ignore_report(request):
-    if not config.IGNORE_BROWSER_EXTENSIONS:
-        return False
-    json_str = request.body
-    if isinstance(json_str, bytes):
-        json_str = json_str.decode('utf-8')
-    report = json.loads(json_str)
-    src_file = report.get('source-file', '')
-    if src_file.startswith('moz-extension://'):
+def import_from_dotted_path(name):
+    module_name, function_name = name.rsplit('.', 1)
+    return getattr(import_module(module_name), function_name)
+
+
+def should_process_report(request):
+    if not config.FILTER_FUNCTION:
         return True
-    return False
+    global _filter_function
+    if _filter_function is None:
+        _filter_function = import_from_dotted_path(config.FILTER_FUNCTION)
+    return _filter_function(request)

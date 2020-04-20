@@ -36,7 +36,7 @@ Supports Python 2.7, 3.5 to 3.7 and Django 1.8 to 2.2.
     * `CSP_REPORTS_LOG_LEVEL` (`str`, one of the Python logging module's available log functions, defaults to `'warning'`).
     * `CSP_REPORTS_SAVE` (`bool` defaults to `True`).  Determines whether the reports are saved to the database.
     * `CSP_REPORTS_ADDITIONAL_HANDLERS` (`iterable` defaults to `[]`). Each value should be a dot-separated string path to a function which you want be called when a report is received. Each function is passed the `HttpRequest` of the CSP report.
-    * `CSP_REPORTS_IGNORE_BROWSER_EXTENSIONS` (`bool` defaults to `False`). Try to filter out reports caused by browser extensions attempting to inject resources into the page. (See [Handling Browser Extensions](#handling-browser-extensions)).
+    * `CSP_REPORTS_FILTER_FUNCTION` (`str` of dotted path to a callable, defaults to `None`). If set, the specificed function is passed each `request` object before the CSP report is processed. Only requests for which the function returns `True` are processed. See [Filtering Requests](#filtering-requests) below.
     * `CSP_REPORTS_LOGGER_NAME` (`str` defaults to `CSP Reports`). Specifies the logger name that will be used for logging CSP reports, if enabled.
 6. Set a cron to generate summaries.
 7. Enjoy.
@@ -66,8 +66,26 @@ Options:
 * `--top` - limit of how many examples to show. Default is 10.
 
 
-### Handling Browser Extensions
+### Filtering Requests
 
-In some browsers, user-installed browser extensions will attempt to inject scripts into your site, causing CSP violations. This can cause you to receive reports for errors which aren't caused by or fixable by you (website creator). There's a [bug for this in Firefox](https://bugzilla.mozilla.org/show_bug.cgi?id=1267027), but until that bug is fixed, you may receive CSP reports for violations caused by extensions.
+If you want to filter out some CSP reports (e.g. reports caused by browser extensions trying to inject scripts into the page), you can do so using the `CSP_REPORTS_FILTER_FUNCTION`.
 
-By setting `CSP_REPORTS_IGNORE_BROWSER_EXTENSIONS` to `True`, the CSP Reports app will attempt to filter out these reports (reliability not guaranteed).
+*Example*
+
+```python
+# settings.py
+CSP_REPORTS_FILTER_FUNCTION = 'myapp.utils.filter_csp_report'
+
+# myapp/utils.py
+import json
+
+def filter_csp_report(request):
+    report = json_str = request.body
+    if isinstance(json_str, bytes):
+        json_str = json_str.decode(request.encoding or 'utf-8')
+    report = json.loads(request.body)
+    src_file = report.get('source-file', '')
+    if src_file.startswith('moz-extension://'):
+        return False
+    return True
+```
