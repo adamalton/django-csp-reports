@@ -26,17 +26,17 @@ Supports Python 2.7, 3.5 to 3.8 and Django 1.11 to 3.0.
 
 ### How Do I Use This Thing?
 
-1. Install this app into your Django project somehow.
+1. Install this app into your Django project, e.g. `pip install django-csp-reports`.
 2. Add `'cspreports'` to your `INSTALLED_APPS`.
-3. Include `cspreports.urls` in your URL config somewhere.
+3. Include `cspreports.urls` in your URL config somewhere, e.g. `urlpatterns = [path('csp/', include('cspreports.urls'))]`.
 4. In your `Content-Security-Policy` HTTP headers, set `reverse('report_csp')` as the `report-uri`.  (Note, with django-csp, you will want to set `CSP_REPORT_URI = reverse_lazy('report_csp')` in settings.py).
-5. Set all/any of the following into settings.py as you so desire, hopefully they are self-explanatory:
+5. Set all/any of the following in settings.py as you so desire, hopefully they are self-explanatory:
     * `CSP_REPORTS_EMAIL_ADMINS` (`bool` defaults to `True`).
-    * `CSP_REPORTS_LOG` (`bool` defaults to `True`).
+    * `CSP_REPORTS_LOG` (`bool`, whether or not to log the reporting using the python `logging` module, defaults to `True`).
     * `CSP_REPORTS_LOG_LEVEL` (`str`, one of the Python logging module's available log functions, defaults to `'warning'`).
     * `CSP_REPORTS_SAVE` (`bool` defaults to `True`).  Determines whether the reports are saved to the database.
     * `CSP_REPORTS_ADDITIONAL_HANDLERS` (`iterable` defaults to `[]`). Each value should be a dot-separated string path to a function which you want be called when a report is received. Each function is passed the `HttpRequest` of the CSP report.
-    * `CSP_REPORTS_FILTER_FUNCTION` (`str` of dotted path to a callable, defaults to `None`). If set, the specificed function is passed each `request` object before the CSP report is processed. Only requests for which the function returns `True` are processed. See [Filtering Requests](#filtering-requests) below.
+    * `CSP_REPORTS_FILTER_FUNCTION` (`str` of dotted path to a callable, defaults to `None`). If set, the specificed function is passed each `HttpRequest` object of the CSP report before it's processed. Only requests for which the function returns `True` are processed. See [Filtering Requests](#filtering-requests) below.
     * `CSP_REPORTS_LOGGER_NAME` (`str` defaults to `CSP Reports`). Specifies the logger name that will be used for logging CSP reports, if enabled.
 6. Set a cron to generate summaries.
 7. Enjoy.
