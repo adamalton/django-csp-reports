@@ -84,7 +84,7 @@ def filter_csp_report(request):
     if isinstance(json_str, bytes):
         json_str = json_str.decode(request.encoding or 'utf-8')
     report = json.loads(request.body)
-    src_file = report.get('source-file', '')
+    src_file = report.get('csp-report', {}).get('source-file', '')
     if src_file.startswith('moz-extension://'):
         return False
     return True
