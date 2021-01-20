@@ -85,7 +85,13 @@ def filter_csp_report(request):
         json_str = json_str.decode(request.encoding or 'utf-8')
     report = json.loads(request.body)
     src_file = report.get('csp-report', {}).get('source-file', '')
-    if src_file.startswith('moz-extension://'):
+    ignored_prefixes = (
+        'safari-extension://',
+        'safari-web-extension://',
+        'moz-extension://',
+        'chrome-extension://',
+    )
+    if any(src_file.startswith(prefix) for prefix in ignored_prefixes):
         return False
     return True
 ```
