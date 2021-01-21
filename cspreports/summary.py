@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from django.template import Context, Engine
+from django.template.loader import get_template
 from six.moves.urllib.parse import urlsplit, urlunsplit
 
 from cspreports.models import CSPReport
@@ -40,51 +40,6 @@ class ViolationInfo(object):
             self.examples.append(report)
 
 
-SUMMARY_TEMPLATE = (
-    'CSP report summary\n'
-    '==================\n'
-    'Start: {{ since }}\n'
-    'End: {{ to }}\n'
-    'Total number of reports: {{ total_count }}\n'
-    'Total number of valid reports: {{ valid_count }}\n'
-    'Total number of invalid reports: {{ invalid_count }}\n'
-    '{% if sources %}'
-        '\n'
-        'Violation sources\n'
-        '=================\n'
-        '{% for info in sources %}'
-            '\n'
-            '{{ info.root_uri }}: {{ info.count }}\n'
-            '----------------------------------------\n'
-            '{% for example in info.examples %}'
-                '{{ example|safe }}\n'
-            '{% endfor %}'
-        '{% endfor %}'
-    '{% endif %}'
-    '{% if blocks %}'
-        '\n'
-        'Blocked URIs\n'
-        '============\n'
-        '{% for info in blocks %}'
-            '\n'
-            '{{ info.root_uri }}: {{ info.count }}\n'
-            '----------------------------------------\n'
-            '{% for example in info.examples %}'
-                '{{ example|safe }}\n'
-            '{% endfor %}'
-        '{% endfor %}'
-    '{% endif %}'
-    '{% if invalid_reports %}'
-        '\n'
-        'Invalid reports\n'
-        '===============\n'
-        '{% for example in invalid_reports %}'
-            '{{ example|safe }}\n'
-        '{% endfor %}'
-    '{% endif %}'
-) # NOQA
-
-
 class CspReportSummary(object):
     """CSP report summary.
 
@@ -117,8 +72,8 @@ class CspReportSummary(object):
 
     def render(self):
         """Render the summary."""
-        engine = Engine()
-        return engine.from_string(SUMMARY_TEMPLATE).render(Context(self.__dict__))
+        template = get_template('cspreports/summary.txt')
+        return template.render(self.__dict__)
 
 
 def collect(since, to, top=DEFAULT_TOP):
