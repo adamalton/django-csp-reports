@@ -1,13 +1,11 @@
 """Test commands."""
-from __future__ import unicode_literals
-
 from datetime import datetime
+from io import StringIO
+from unittest.mock import patch
 
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from mock import patch
-from six import StringIO
 
 from cspreports.models import CSPReport
 

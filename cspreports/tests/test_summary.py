@@ -1,11 +1,8 @@
 """Test `summary` module."""
-from __future__ import unicode_literals
-
 from datetime import datetime
+from unittest.mock import sentinel
 
 from django.test import SimpleTestCase, TestCase
-from mock import sentinel
-from six import assertCountEqual
 
 from cspreports.models import CSPReport
 from cspreports.summary import CspReportSummary, ViolationInfo, collect, get_root_uri
@@ -89,10 +86,10 @@ class TestCollect(TestCase):
 
         self.assertEqual(summary.total_count, 0)
         self.assertEqual(summary.valid_count, 0)
-        assertCountEqual(self, summary.sources, ())
-        assertCountEqual(self, summary.blocks, ())
+        self.assertCountEqual(summary.sources, ())
+        self.assertCountEqual(summary.blocks, ())
         self.assertEqual(summary.invalid_count, 0)
-        assertCountEqual(self, summary.invalid_reports, ())
+        self.assertCountEqual(summary.invalid_reports, ())
 
     def test_invalid_reports(self):
         report1 = create_csp_report(datetime(1970, 1, 1, 12))
@@ -101,10 +98,10 @@ class TestCollect(TestCase):
 
         self.assertEqual(summary.total_count, 2)
         self.assertEqual(summary.valid_count, 0)
-        assertCountEqual(self, summary.sources, ())
-        assertCountEqual(self, summary.blocks, ())
+        self.assertCountEqual(summary.sources, ())
+        self.assertCountEqual(summary.blocks, ())
         self.assertEqual(summary.invalid_count, 2)
-        assertCountEqual(self, summary.invalid_reports, (report1, report2))
+        self.assertCountEqual(summary.invalid_reports, (report1, report2))
 
     def test_valid_reports(self):
         report1 = create_csp_report(datetime(1970, 1, 1, 12), is_valid=True, document_uri='http://example.cz/',
@@ -121,13 +118,13 @@ class TestCollect(TestCase):
         source = summary.sources[0]
         self.assertEqual(source.root_uri, 'http://example.cz/')
         self.assertEqual(source.count, 2)
-        assertCountEqual(self, source.examples, (report1, report2))
+        self.assertCountEqual(source.examples, (report1, report2))
         # Check blocks
         self.assertEqual(len(summary.blocks), 1)
         block = summary.blocks[0]
         self.assertEqual(block.root_uri, 'http://example.evil/')
         self.assertEqual(block.count, 2)
-        assertCountEqual(self, block.examples, (report1, report2))
+        self.assertCountEqual(block.examples, (report1, report2))
         # Check invalid
         self.assertEqual(summary.invalid_count, 0)
-        assertCountEqual(self, summary.invalid_reports, ())
+        self.assertCountEqual(summary.invalid_reports, ())

@@ -1,10 +1,8 @@
 """Collect summary of CSP reports."""
-from __future__ import unicode_literals
-
 from operator import attrgetter
+from urllib.parse import urlsplit, urlunsplit
 
 from django.template.loader import get_template
-from six.moves.urllib.parse import urlsplit, urlunsplit
 
 from cspreports.models import CSPReport
 
@@ -17,7 +15,7 @@ def get_root_uri(uri):
     return urlunsplit((chunks.scheme, chunks.netloc, chunks.path, '', ''))
 
 
-class ViolationInfo(object):
+class ViolationInfo:
     """Container for violation details.
 
     @ivar root_uri: A violation root URI.
@@ -40,7 +38,7 @@ class ViolationInfo(object):
             self.examples.append(report)
 
 
-class CspReportSummary(object):
+class CspReportSummary:
     """CSP report summary.
 
     @ivar since: Date and time of the summary start

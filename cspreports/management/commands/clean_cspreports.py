@@ -1,6 +1,4 @@
 """Command to clean old CSP reports."""
-from __future__ import unicode_literals
-
 from datetime import timedelta
 
 from django.core.management.base import BaseCommand, CommandError
