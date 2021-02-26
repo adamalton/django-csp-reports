@@ -130,10 +130,12 @@ class CSPReport(models.Model):
             min_value, max_value = connection.ops.integer_field_range(field.get_internal_type())
             if min_value is None:
                 min_value = 0
-            # All these fields are possitive. Value can't be negative.
+            # All these fields are positive. Value can't be negative.
             min_value = max(min_value, 0)
-            if value is not None and min_value <= value and (max_value is None or value <= max_value):
-                setattr(self, field_name, value)
+            if value is not None:
+                value = int(value)
+                if min_value <= value and (max_value is None or value <= max_value):
+                    setattr(self, field_name, value)
         # Extract disposition
         disposition = report_data.get('disposition')
         if disposition in dict(DISPOSITIONS).keys():
