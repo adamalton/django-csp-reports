@@ -1,6 +1,4 @@
 """Settings for cspreports tests."""
-from __future__ import unicode_literals
-
 SECRET_KEY = 'CSP_REPORTS_TESTS'
 
 INSTALLED_APPS = [

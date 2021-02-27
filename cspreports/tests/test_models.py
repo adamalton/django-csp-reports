@@ -1,16 +1,9 @@
 """Test for `cspreports.models`."""
-from __future__ import unicode_literals
-
 import json
 
 from django.test import SimpleTestCase
 
 from cspreports.models import CSPReport
-
-try:
-    from django.utils.six import text_type
-except ImportError:
-    text_type = str
 
 
 class TestCSPReport(SimpleTestCase):
@@ -33,10 +26,10 @@ class TestCSPReport(SimpleTestCase):
         self.assertJSONEqual(CSPReport(json=json.dumps({'csp-report': {'key': 'value'}})).nice_report, {'key': 'value'})
 
     def test_text_representation(self):
-        self.assertEqual(text_type(CSPReport(json='')), '[no CSP report data]')
-        self.assertEqual(text_type(CSPReport(json='Not a JSON')), "Invalid CSP report: 'Not a JSON'")
-        self.assertJSONEqual(text_type(CSPReport(json=json.dumps({'csp-report': {}}))), {})
-        self.assertJSONEqual(text_type(CSPReport(json=json.dumps({'csp-report': {'key': 'value'}}))), {'key': 'value'})
+        self.assertEqual(str(CSPReport(json='')), '[no CSP report data]')
+        self.assertEqual(str(CSPReport(json='Not a JSON')), "Invalid CSP report: 'Not a JSON'")
+        self.assertJSONEqual(str(CSPReport(json=json.dumps({'csp-report': {}}))), {})
+        self.assertJSONEqual(str(CSPReport(json=json.dumps({'csp-report': {'key': 'value'}}))), {'key': 'value'})
 
 
 class TestFromMessage(SimpleTestCase):

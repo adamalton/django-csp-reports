@@ -1,6 +1,4 @@
 # STANDARD LIB
-from __future__ import unicode_literals
-
 import json
 
 from django.db import connection, models
@@ -62,7 +60,7 @@ class CSPReport(models.Model):
     @ivar disposition: The disposition of violation's policy.
     """
 
-    class Meta(object):
+    class Meta:
         ordering = ('-created',)
 
     created = models.DateTimeField(auto_now_add=True)

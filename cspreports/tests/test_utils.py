@@ -1,14 +1,11 @@
-from __future__ import unicode_literals
-
 import json
 from datetime import datetime
+from unittest.mock import patch
 
-import mock
 from django.http import HttpRequest
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
-from mock import patch
 
 from cspreports import utils
 from cspreports.models import CSPReport
@@ -34,7 +31,7 @@ class UtilsTest(TestCase):
             "CSP_REPORTS_LOG",
         ]
         for i in range(len(mock_paths)):
-            mocks = [mock.patch(path) for path in mock_paths]
+            mocks = [patch(path) for path in mock_paths]
             settings_overrides = {
                 setting: True if j == i else False
                 for j, setting in enumerate(corresponding_settings)
@@ -78,7 +75,7 @@ class UtilsTest(TestCase):
         report = '{"document-uri": "http://example.com/"}'
         formatted_report = utils.format_report(report)
         request._body = report
-        with mock.patch("cspreports.utils.logger.warning") as warning_mock:
+        with patch("cspreports.utils.logger.warning") as warning_mock:
             utils.log_report(request)
             self.assertTrue(warning_mock.called)
             log_message = warning_mock.call_args[0][0] % warning_mock.call_args[0][1:]
@@ -91,7 +88,7 @@ class UtilsTest(TestCase):
         formatted_report = utils.format_report(report)
         request._body = report
         # Note that we are mocking the *Django* mail_admins function here.
-        with mock.patch("cspreports.utils.mail_admins") as mock_mail_admins:
+        with patch("cspreports.utils.mail_admins") as mock_mail_admins:
             utils.email_admins(request)
             self.assertTrue(mock_mail_admins.called)
             message = mock_mail_admins.call_args[0][1]
@@ -134,7 +131,7 @@ class UtilsTest(TestCase):
         report2 = '{"document-uri": "http://included.com/"}'
         request = HttpRequest()
         request._body = report1
-        with mock.patch('cspreports.utils.log_report') as log_patch:
+        with patch('cspreports.utils.log_report') as log_patch:
             utils.process_report(request)
             self.assertFalse(log_patch.called)
             request._body = report2

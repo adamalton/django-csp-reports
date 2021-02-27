@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 import logging
 from datetime import datetime
@@ -69,7 +67,7 @@ def run_additional_handlers(request):
         handler(request)
 
 
-class Config(object):
+class Config:
     """ Configuration with defaults, each of which is overrideable in django settings. """
 
     # Defaults, these are overridden using "CSP_REPORTS_"-prefixed versions in settings.py
@@ -84,7 +82,7 @@ class Config(object):
         try:
             return getattr(settings, "%s%s" % ("CSP_REPORTS_", name))
         except AttributeError:
-            return super(Config, self).__getattribute__(name)
+            return super().__getattribute__(name)
 
 
 config = Config()

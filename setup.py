@@ -2,8 +2,8 @@
 from setuptools import find_packages, setup
 
 PACKAGES = find_packages()
-REQUIREMENTS = ['django >=1.11,<4.0', 'six']
-TEST_REQUIREMENTS = ['mock', 'coverage']
+REQUIREMENTS = ['django >=1.11,<4.0']
+TEST_REQUIREMENTS = ['coverage']
 EXTRAS_REQUIRE = {
     'quality': ['isort', 'flake8'],
     'test': TEST_REQUIREMENTS,
@@ -11,9 +11,8 @@ EXTRAS_REQUIRE = {
 CLASSIFIERS = ['License :: OSI Approved :: MIT License',
                'Framework :: Django',
                'Programming Language :: Python',
-               'Programming Language :: Python :: 2',
-               'Programming Language :: Python :: 2.7',
                'Programming Language :: Python :: 3',
+               'Programming Language :: Python :: 3 :: Only',
                'Programming Language :: Python :: 3.4',
                'Programming Language :: Python :: 3.5',
                'Programming Language :: Python :: 3.6',
@@ -37,7 +36,7 @@ setup(
     download_url='https://github.com/adamalton/django-csp-reports/tarball/1.4',
     packages=PACKAGES,
     include_package_data=True,
-    python_requires='>=2.7',
+    python_requires='>=3.4',
     install_requires=REQUIREMENTS,
     tests_require=TEST_REQUIREMENTS,
     extras_require=EXTRAS_REQUIRE,
