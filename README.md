@@ -1,4 +1,8 @@
-# Django Content Security Policy Reports
+# Django Content Security Policy Reports - Python 2.7 Support Branch
+
+The `python2.7-support` branch exists to allow Python 2.7 support, which has been removed from the main codebase.
+
+Any essential fixes for Python 2.7 should be branched from and merged into this branch.
 
 [![Build Status](https://travis-ci.org/adamalton/django-csp-reports.svg)](https://travis-ci.org/adamalton/django-csp-reports)
 
