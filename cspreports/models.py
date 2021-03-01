@@ -3,14 +3,12 @@ from __future__ import unicode_literals
 
 import json
 
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
-
-from django.core.validators import MinValueValidator
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-
 
 DISPOSITIONS = (
     ('enforce'),
