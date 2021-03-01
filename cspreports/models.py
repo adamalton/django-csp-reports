@@ -3,34 +3,45 @@ from __future__ import unicode_literals
 
 import json
 
-from django.db import connection, models
+from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
+from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
+
 DISPOSITIONS = (
-    ('enforce', 'enforce'),
-    ('report', 'report'),
+    ('enforce'),
+    ('report'),
 )
 
 # Map of required CSP report fields to model fields
-REQUIRED_FIELD_MAP = (
-    ('document-uri', 'document_uri'),
-    ('referrer', 'referrer'),
-    ('blocked-uri', 'blocked_uri'),
-    ('violated-directive', 'violated_directive'),
-    ('original-policy', 'original_policy'),
+REQUIRED_FIELDS = (
+    ('document-uri'),
+    ('referrer'),
+    ('blocked-uri'),
+    ('violated-directive'),
+    ('original-policy'),
 )
 # Map of optional (CSP >= 2.0) CSP report fields to model fields
-OPTIONAL_FIELD_MAP = (
-    ('effective-directive', 'effective_directive'),
-    ('source-file', 'source_file'),
+OPTIONAL_FIELDS = (
+    ('disposition'),
+    ('effective-directive'),
+    ('source-file'),
+    ('status-code'),
+    ('line-number'),
+    ('column-number'),
 )
-# Map of optional report fields with integer values.
-INTEGER_FIELD_MAP = (
-    ('status-code', 'status_code'),
-    ('line-number', 'line_number'),
-    ('column-number', 'column_number'),
-)
+
+
+def validate_disposition(value):
+    if value not in DISPOSITIONS:
+        raise ValidationError(
+            _('%(value)s is not the valid set of disposition values'),
+            params={'value': value},
+        )
 
 
 class CSPReport(models.Model):
@@ -77,11 +88,11 @@ class CSPReport(models.Model):
     violated_directive = models.TextField(blank=True, null=True)
     original_policy = models.TextField(blank=True, null=True)
     effective_directive = models.TextField(blank=True, null=True)
-    status_code = models.PositiveSmallIntegerField(blank=True, null=True)
+    status_code = models.PositiveSmallIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
     source_file = models.TextField(blank=True, null=True)
-    line_number = models.PositiveIntegerField(blank=True, null=True)
-    column_number = models.PositiveIntegerField(blank=True, null=True)
-    disposition = models.CharField(max_length=10, blank=True, null=True, choices=DISPOSITIONS)
+    line_number = models.PositiveIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
+    column_number = models.PositiveIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
+    disposition = models.CharField(max_length=10, blank=True, null=True, validators=[validate_disposition])
 
     @property
     def nice_report(self):
@@ -98,6 +109,16 @@ class CSPReport(models.Model):
 
     def __str__(self):
         return self.nice_report
+
+    def full_clean(self):
+        super(CSPReport, self).full_clean()
+        for field_name in REQUIRED_FIELDS:
+            django_field_name = field_name.replace("-", "_")
+            if getattr(self, django_field_name) is None:
+                raise ValidationError(
+                    _('%(value)s should be a required field'),
+                    params={'value': django_field_name},
+                )
 
     @classmethod
     def from_message(cls, message):
@@ -120,34 +141,21 @@ class CSPReport(models.Model):
             # Message is not a valid CSP report. Return as invalid.
             return self
 
-        # Extract individual fields
-        for report_name, field_name in REQUIRED_FIELD_MAP + OPTIONAL_FIELD_MAP:
-            setattr(self, field_name, report_data.get(report_name))
-        # Extract integer fields
-        for report_name, field_name in INTEGER_FIELD_MAP:
-            value = report_data.get(report_name)
-            field = self._meta.get_field(field_name)
-            min_value, max_value = connection.ops.integer_field_range(field.get_internal_type())
-            if min_value is None:
-                min_value = 0
-            # All these fields are positive. Value can't be negative.
-            min_value = max(min_value, 0)
-            if value is not None:
-                value = int(value)
-                if min_value <= value and (max_value is None or value <= max_value):
-                    setattr(self, field_name, value)
-        # Extract disposition
-        disposition = report_data.get('disposition')
-        if disposition in dict(DISPOSITIONS).keys():
-            self.disposition = disposition
+        fields = REQUIRED_FIELDS + OPTIONAL_FIELDS
+        for json_field_name in fields:
+            django_field_name = json_field_name.replace("-", "_")
+            converter = cls._meta.get_field(django_field_name).to_python
+            try:
+                value = converter(report_data.get(json_field_name))
+                setattr(self, django_field_name, value)
+            except ValidationError:
+                pass
 
-        # Check if report is valid
-        is_valid = True
-        for field_name in dict(REQUIRED_FIELD_MAP).values():
-            if getattr(self, field_name) is None:
-                is_valid = False
-                break
-        self.is_valid = is_valid
+        try:
+            self.full_clean()
+            self.is_valid = True
+        except ValidationError:
+            self.is_valid = False
 
         return self
 

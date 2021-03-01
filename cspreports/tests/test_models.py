@@ -168,14 +168,14 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
-        self.assertTrue(report.is_valid)
+        self.assertFalse(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
         self.assertEqual(report.blocked_uri, 'http://dangerous.example.cz/')
         self.assertEqual(report.violated_directive, 'Very protective directive.')
         self.assertEqual(report.original_policy, 'Nothing is allowed.')
-        self.assertIsNone(report.line_number)
+        self.assertEqual(report.line_number, -666)
 
     def test_valid_disposition(self):
         # Test valid disposition is extracted.
@@ -208,14 +208,14 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
-        self.assertTrue(report.is_valid)
+        self.assertFalse(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
         self.assertEqual(report.blocked_uri, 'http://dangerous.example.cz/')
         self.assertEqual(report.violated_directive, 'Very protective directive.')
         self.assertEqual(report.original_policy, 'Nothing is allowed.')
-        self.assertIsNone(report.disposition)
+        self.assertEqual(report.disposition, 'INVALID')
 
     def test_json_str_value_to_int(self):
         data = {
