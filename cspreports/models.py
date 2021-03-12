@@ -108,16 +108,6 @@ class CSPReport(models.Model):
     def __str__(self):
         return self.nice_report
 
-    def full_clean(self):
-        super(CSPReport, self).full_clean()
-        for field_name in REQUIRED_FIELDS:
-            django_field_name = field_name.replace("-", "_")
-            if getattr(self, django_field_name) is None:
-                raise ValidationError(
-                    _('%(value)s should be a required field'),
-                    params={'value': django_field_name},
-                )
-
     @classmethod
     def from_message(cls, message):
         """Creates an instance from CSP report message.
@@ -148,12 +138,6 @@ class CSPReport(models.Model):
                 setattr(self, django_field_name, value)
             except ValidationError:
                 pass
-
-        try:
-            self.full_clean()
-            self.is_valid = True
-        except ValidationError:
-            self.is_valid = False
 
         return self
 
