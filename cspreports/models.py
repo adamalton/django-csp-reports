@@ -93,6 +93,7 @@ class CSPReport(models.Model):
     disposition = models.CharField(max_length=10, blank=True, null=True, choices=DISPOSITIONS)
 
     def clean(self):
+        super(CSPReport, self).clean()
         for field in REQUIRED_FIELDS:
             django_field_name = field.replace("-", "_")
             model_field = getattr(self, django_field_name)
