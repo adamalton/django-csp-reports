@@ -61,9 +61,7 @@ def save_report(request):
         message = message.decode(request.encoding or settings.DEFAULT_CHARSET)
 
     report_form = CSPReportForm(message)
-    form_is_valid = report_form.is_valid()
     report_obj = report_form.save(commit=False)
-    report_obj.is_valid = form_is_valid
     report_obj.user_agent = request.META.get('HTTP_USER_AGENT', '')
     report_obj.save()
 
