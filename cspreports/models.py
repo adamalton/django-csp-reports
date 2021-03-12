@@ -11,8 +11,8 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 DISPOSITIONS = (
-    ('enforce'),
-    ('report'),
+    ('enforce', 'enforce'),
+    ('report', 'report'),
 )
 
 # Map of required CSP report fields to model fields
@@ -90,7 +90,7 @@ class CSPReport(models.Model):
     source_file = models.TextField(blank=True, null=True)
     line_number = models.PositiveIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
     column_number = models.PositiveIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
-    disposition = models.CharField(max_length=10, blank=True, null=True, validators=[validate_disposition])
+    disposition = models.CharField(max_length=10, blank=True, null=True, choices=DISPOSITIONS)
 
     @property
     def nice_report(self):
