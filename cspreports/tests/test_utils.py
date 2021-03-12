@@ -50,27 +50,6 @@ class UtilsTest(TestCase):
                         else:
                             self.assertFalse(mocked_object.called)
 
-    def test_save_report(self):
-        """ Test that the `save_report` handler correctly saves to the DB. """
-        assert CSPReport.objects.count() == 0  # sanity
-        body = '{"document-uri": "http://example.com/"}'
-        request = RequestFactory(HTTP_USER_AGENT='Agent007').post('/dummy/', body, content_type=JSON_CONTENT_TYPE)
-
-        utils.save_report(request)
-
-        reports = CSPReport.objects.all()
-        self.assertQuerysetEqual(reports.values_list('user_agent'), [('Agent007', )], transform=tuple)
-        self.assertEqual(reports[0].json, body)
-
-    def test_save_report_no_agent(self):
-        """Test that the `save_report` handler correctly handles missing user agent header."""
-        request = RequestFactory().post('/dummy/', '{"document-uri": "http://example.com/"}',
-                                        content_type=JSON_CONTENT_TYPE)
-
-        utils.save_report(request)
-
-        self.assertQuerysetEqual(CSPReport.objects.values_list('user_agent'), [('', )], transform=tuple)
-
     @override_settings(CSP_REPORTS_LOG_LEVEL='warning')
     def test_log_report(self):
         """ Test that the `log_report` handler correctly logs at the right level. """
@@ -191,3 +170,88 @@ class TestGetMidnight(SimpleTestCase):
             mock_now = datetime(2016, 4, 27, 12, 34)
             with patch('cspreports.utils.now', return_value=mock_now):
                 self.assertEqual(get_midnight(), datetime(2016, 4, 27))
+
+
+class SaveReporrTest(TestCase):
+
+    def test_save_report_missing_root_element(self):
+        """ Test that the `save_report` handler correctly saves to the DB. """
+        assert CSPReport.objects.count() == 0  # sanity
+        body = '{"document-uri": "http://example.com/"}'
+        request = RequestFactory(HTTP_USER_AGENT='Agent007').post('/dummy/', body, content_type=JSON_CONTENT_TYPE)
+
+        utils.save_report(request)
+
+        reports = CSPReport.objects.all()
+        self.assertQuerysetEqual(reports.values_list('user_agent'), [('Agent007', )], transform=tuple)
+        report = reports[0]
+        self.assertEqual(report.json, body)
+        self.assertFalse(report.is_valid)
+
+    def test_save_report_no_agent(self):
+        """Test that the `save_report` handler correctly handles missing user agent header."""
+        request = RequestFactory().post('/dummy/', '{"document-uri": "http://example.com/"}',
+                                        content_type=JSON_CONTENT_TYPE)
+
+        utils.save_report(request)
+
+        reports = CSPReport.objects.all()
+        report = reports[0]
+        self.assertQuerysetEqual(report.user_agent, '')
+
+    def test_save_report_correct_format_missing_mandatory_fields(self):
+        """ Test that the `save_report` saves CSPReport instance even if some required CSP Report fields are missing."""
+        assert CSPReport.objects.count() == 0  # sanity
+        body = {
+            'csp-report': {
+                'document-uri': 'http://protected.example.cz/',
+                'referrer': '',
+                'blocked-uri': '',
+                'violated-directive': 'Very protective directive.',
+                'original-policy': 'Nothing is allowed.'
+            }
+        }
+        request = RequestFactory(HTTP_USER_AGENT='Agent007').post('/dummy/', json.dumps(body),
+                                                                  content_type=JSON_CONTENT_TYPE)
+        utils.save_report(request)
+
+        reports = CSPReport.objects.all()
+        self.assertQuerysetEqual(reports.values_list('user_agent'), [('Agent007', )], transform=tuple)
+        report = reports[0]
+        self.assertEqual(report.json, json.dumps(body))
+        self.assertFalse(report.is_valid)
+
+    def test_save_report_correct_optional_fields(self):
+        """ Test that the `save_report` saves CSPReport instance even if some required CSP Report fields are missing."""
+        assert CSPReport.objects.count() == 0  # sanity
+        body = {
+            'csp-report': {
+                'document-uri': 'http://protected.example.cz/',
+                'referrer': 'http://referrer.example.cz/',
+                'blocked-uri': 'http://dangerous.example.cz/',
+                'violated-directive': 'Very protective directive.',
+                'original-policy': 'Nothing is allowed.',
+                'source-file': 'nasty-script.js',
+                'status-code': 0,
+                'line-number': '36',
+                'column-number': 32,
+            }
+        }
+        request = RequestFactory(HTTP_USER_AGENT='Agent007').post('/dummy/', json.dumps(body),
+                                                                  content_type=JSON_CONTENT_TYPE)
+        utils.save_report(request)
+
+        reports = CSPReport.objects.all()
+        report = reports[0]
+        self.assertEqual(report.json, json.dumps(body))
+        self.assertEqual(report.user_agent, 'Agent007')
+        self.assertEqual(report.document_uri, 'http://protected.example.cz/')
+        self.assertEqual(report.referrer, 'http://referrer.example.cz/')
+        self.assertEqual(report.blocked_uri, 'http://dangerous.example.cz/')
+        self.assertEqual(report.violated_directive, 'Very protective directive.')
+        self.assertEqual(report.original_policy, 'Nothing is allowed.')
+        self.assertEqual(report.source_file, 'nasty-script.js')
+        self.assertEqual(report.status_code, 0)
+        self.assertEqual(report.line_number, 36)
+        self.assertEqual(report.column_number, 32)
+        self.assertTrue(report.is_valid)
