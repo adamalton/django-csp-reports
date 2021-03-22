@@ -8,7 +8,6 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
 
 DISPOSITIONS = (
     ('enforce', 'enforce'),
@@ -32,14 +31,6 @@ OPTIONAL_FIELDS = (
     ('line-number'),
     ('column-number'),
 )
-
-
-def validate_disposition(value):
-    if value not in DISPOSITIONS:
-        raise ValidationError(
-            _('%(value)s is not the valid set of disposition values'),
-            params={'value': value},
-        )
 
 
 class CSPReport(models.Model):
