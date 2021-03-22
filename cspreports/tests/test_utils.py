@@ -172,7 +172,7 @@ class TestGetMidnight(SimpleTestCase):
                 self.assertEqual(get_midnight(), datetime(2016, 4, 27))
 
 
-class SaveReporrTest(TestCase):
+class SaveReportTest(TestCase):
 
     def test_save_report_missing_root_element(self):
         """ Test that the `save_report` handler correctly saves to the DB. """
