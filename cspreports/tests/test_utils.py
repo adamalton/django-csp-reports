@@ -219,7 +219,7 @@ class SaveReportTest(TestCase):
         self.assertQuerysetEqual(reports.values_list('user_agent'), [('Agent007', )], transform=tuple)
         report = reports[0]
         self.assertEqual(report.json, json.dumps(body))
-        self.assertFalse(report.is_valid)
+        self.assertTrue(report.is_valid)
 
     def test_save_report_correct_optional_fields(self):
         """ Test that the `save_report` saves CSPReport instance even if some required CSP Report fields are missing."""

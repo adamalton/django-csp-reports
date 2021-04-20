@@ -46,6 +46,7 @@ class TestFromMessage(SimpleTestCase):
         # Test report which is not a valid JSON.
         report = CSPReport.from_message('NOT_A_JSON')
 
+        self.assertFalse(report.is_valid)
         self.assertEqual(report.json, 'NOT_A_JSON')
         self.assertIsNone(report.document_uri)
 
@@ -53,6 +54,7 @@ class TestFromMessage(SimpleTestCase):
         # Test report which is only a valid JSON.
         report = CSPReport.from_message('{}')
 
+        self.assertFalse(report.is_valid)
         self.assertEqual(report.json, '{}')
         self.assertIsNone(report.document_uri)
 
@@ -60,6 +62,7 @@ class TestFromMessage(SimpleTestCase):
         # Test JSON with empty 'csp-report' object.
         report = CSPReport.from_message("{'csp-report': {}}")
 
+        self.assertFalse(report.is_valid)
         self.assertEqual(report.json, "{'csp-report': {}}")
         self.assertIsNone(report.document_uri)
 
@@ -69,6 +72,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
+        self.assertFalse(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertIsNone(report.document_uri)
         self.assertEqual(report.blocked_uri, 'self')
@@ -84,6 +88,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
+        self.assertTrue(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
@@ -103,6 +108,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
+        self.assertTrue(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
@@ -122,6 +128,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
+        self.assertTrue(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, '')
@@ -141,6 +148,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
+        self.assertTrue(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
@@ -160,6 +168,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
+        self.assertTrue(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
@@ -179,6 +188,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
+        self.assertTrue(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
@@ -198,6 +208,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
+        self.assertTrue(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
@@ -224,6 +235,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
+        self.assertTrue(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')

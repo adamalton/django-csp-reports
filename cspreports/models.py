@@ -83,16 +83,6 @@ class CSPReport(models.Model):
     column_number = models.PositiveIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
     disposition = models.CharField(max_length=10, blank=True, null=True, choices=DISPOSITIONS)
 
-    def clean(self):
-        super(CSPReport, self).clean()
-        for field in REQUIRED_FIELDS:
-            django_field_name = field.replace("-", "_")
-            model_field = getattr(self, django_field_name)
-            if model_field is None or model_field == '':
-                self.is_valid = False
-                return
-        self.is_valid = True
-
     @property
     def nice_report(self):
         """Return a nicely formatted original report."""
@@ -139,6 +129,16 @@ class CSPReport(models.Model):
                 setattr(self, django_field_name, value)
             except ValidationError:
                 pass
+
+        # validate report
+        is_valid = True
+        for field in REQUIRED_FIELDS:
+            django_field_name = field.replace("-", "_")
+            model_field = getattr(self, django_field_name)
+            if model_field is None:
+                is_valid = False
+                break
+        self.is_valid = is_valid
 
         return self
 
