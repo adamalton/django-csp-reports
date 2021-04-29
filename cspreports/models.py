@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import json
 
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -77,10 +76,10 @@ class CSPReport(models.Model):
     violated_directive = models.TextField(blank=True, null=True)
     original_policy = models.TextField(blank=True, null=True)
     effective_directive = models.TextField(blank=True, null=True)
-    status_code = models.PositiveSmallIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
+    status_code = models.PositiveSmallIntegerField(blank=True, null=True)
     source_file = models.TextField(blank=True, null=True)
-    line_number = models.PositiveIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
-    column_number = models.PositiveIntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
+    line_number = models.PositiveIntegerField(blank=True, null=True)
+    column_number = models.PositiveIntegerField(blank=True, null=True)
     disposition = models.CharField(max_length=10, blank=True, null=True, choices=DISPOSITIONS)
 
     @property
