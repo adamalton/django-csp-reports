@@ -15,20 +15,20 @@ DISPOSITIONS = (
 
 # Map of required CSP report fields to model fields
 REQUIRED_FIELDS = (
-    ('document-uri'),
-    ('referrer'),
-    ('blocked-uri'),
-    ('violated-directive'),
-    ('original-policy'),
+    ('document-uri', 'document_uri'),
+    ('referrer', 'referrer'),
+    ('blocked-uri', 'blocked_uri'),
+    ('violated-directive', 'violated_directive'),
+    ('original-policy', 'original_policy'),
 )
 # Map of optional (CSP >= 2.0) CSP report fields to model fields
 OPTIONAL_FIELDS = (
-    ('disposition'),
-    ('effective-directive'),
-    ('source-file'),
-    ('status-code'),
-    ('line-number'),
-    ('column-number'),
+    ('disposition', 'disposition'),
+    ('effective-directive', 'effective_directive'),
+    ('source-file', 'source_file'),
+    ('status-code', 'status_code'),
+    ('line-number', 'line_number'),
+    ('column-number', 'column_number'),
 )
 
 
@@ -120,8 +120,7 @@ class CSPReport(models.Model):
             return self
 
         fields = REQUIRED_FIELDS + OPTIONAL_FIELDS
-        for json_field_name in fields:
-            django_field_name = json_field_name.replace("-", "_")
+        for json_field_name, django_field_name in fields:
             converter = cls._meta.get_field(django_field_name).to_python
             try:
                 value = converter(report_data.get(json_field_name))
@@ -131,8 +130,7 @@ class CSPReport(models.Model):
 
         # validate report
         is_valid = True
-        for field in REQUIRED_FIELDS:
-            django_field_name = field.replace("-", "_")
+        for field, django_field_name in REQUIRED_FIELDS:
             model_field = getattr(self, django_field_name)
             if model_field is None:
                 is_valid = False
