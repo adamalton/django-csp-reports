@@ -10,7 +10,7 @@ from django.core.mail import mail_admins
 from django.utils.dateparse import parse_date
 from django.utils.timezone import localtime, make_aware, now
 
-from cspreports.forms import CSPReportForm
+from cspreports.models import CSPReport
 
 logger = logging.getLogger(getattr(settings, "CSP_REPORTS_LOGGER_NAME", "CSP Reports"))
 
@@ -60,10 +60,9 @@ def save_report(request):
     if isinstance(message, bytes):
         message = message.decode(request.encoding or settings.DEFAULT_CHARSET)
 
-    report_form = CSPReportForm(message)
-    report_obj = report_form.save(commit=False)
-    report_obj.user_agent = request.META.get('HTTP_USER_AGENT', '')
-    report_obj.save()
+    report = CSPReport.from_message(message)
+    report.user_agent = request.META.get('HTTP_USER_AGENT', '')
+    report.save()
 
 
 def run_additional_handlers(request):
