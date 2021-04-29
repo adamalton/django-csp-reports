@@ -195,8 +195,8 @@ class SaveReportTest(TestCase):
 
         utils.save_report(request)
 
-        reports = CSPReport.objects.all()
-        self.assertQuerysetEqual(reports.values_list('user_agent', flat=True), ["''"])
+        report = CSPReport.objects.first()
+        self.assertQuerysetEqual(report.user_agent, '')
 
     def test_save_report_correct_format_missing_mandatory_fields(self):
         """ Test that the `save_report` saves CSPReport instance even if some required CSP Report fields are missing."""
