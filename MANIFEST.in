@@ -1,0 +1,2 @@
+include cspreports/*.py
+prune cspreports/tests/
