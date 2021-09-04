@@ -196,13 +196,15 @@ class SaveReportTest(TestCase):
         self.assertQuerysetEqual(report.user_agent, '')
 
     def test_save_report_correct_format_missing_mandatory_fields(self):
-        """ Test that the `save_report` saves CSPReport instance even if some required CSP Report fields are missing."""
+        """ Test that the `save_report` saves CSPReport instance even if some required CSP Report
+            fields are missing. However, the report should have its 'is_valid' field set to False.
+        """
         assert CSPReport.objects.count() == 0  # sanity
         body = {
             'csp-report': {
                 'document-uri': 'http://protected.example.cz/',
-                'referrer': '',
-                'blocked-uri': '',
+                'referrer': '',  # Required, but (for some reason) we treat an empty value as valid
+                'blocked-uri': '',  # Ditto
                 'violated-directive': 'Very protective directive.',
                 'original-policy': 'Nothing is allowed.'
             }
@@ -218,7 +220,9 @@ class SaveReportTest(TestCase):
         self.assertTrue(report.is_valid)
 
     def test_save_report_correct_optional_fields(self):
-        """ Test that the `save_report` saves CSPReport instance even if some required CSP Report fields are missing."""
+        """ Test that the `save_report` saves all field values correctly, including coercion to the
+            correct type(s).
+        """
         assert CSPReport.objects.count() == 0  # sanity
         body = {
             'csp-report': {

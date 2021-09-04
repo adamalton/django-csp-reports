@@ -117,29 +117,36 @@ class CSPReport(models.Model):
             # Message is not a valid CSP report. Return as invalid.
             return self
 
+        is_valid = True
+
         fields = REQUIRED_FIELDS + OPTIONAL_FIELDS
         for json_field_name, django_field_name in fields:
             value = report_data.get(json_field_name)
             # Try to pass the value through as much of Django's coercion/cleaning as possible, but
-            # if the data is not entirely valid, that's not a reason to not still save the report
+            # if the data is not entirely valid that's not a reason to not still save the report
             # if we can; even if the data isn't perfect, some information is better than none.
             to_python = cls._meta.get_field(django_field_name).to_python
             clean = cls._meta.get_field(django_field_name).clean
             try:
                 value = to_python(value)
-                # If the first conversion step worked, then store the value here, even if the next
+                # If the first conversion step worked, then store the value, even if the next
                 # conversion fails
                 setattr(self, django_field_name, value)
                 value = clean(value, model_instance=self)
                 setattr(self, django_field_name, value)
             except ValidationError:
-                pass
+                is_valid = False
 
-        # validate report
-        is_valid = True
+        # Go through the REQUIRED_FIELDS list and make sure that a valid value was supplied for
+        # each of them. Note that for str-type fields we treat a value of "" as valid, but if the
+        # field is missing entirely (i.e. is None) we treat that as invalid. I (Adam) am not sure
+        # if that's the correct way to do it, but it appears to be how we're doing it. Also note
+        # that our model fields have null=True for these required fields, and if we took that off
+        # then this block of code might be unnecessary, as the block of code above would catch the
+        # ValidationError and set `is_valid` to False for us.
         for field, django_field_name in REQUIRED_FIELDS:
-            model_field = getattr(self, django_field_name)
-            if model_field is None:
+            field_value = getattr(self, django_field_name)
+            if field_value is None:
                 is_valid = False
                 break
         self.is_valid = is_valid

@@ -191,7 +191,7 @@ class TestFromMessage(SimpleTestCase):
         self.assertEqual(report.disposition, 'report')
 
     def test_invalid_disposition(self):
-        # Test invalid disposition is ignored.
+        # Test invalid disposition is still saved, but the report is marked as invalid.
         data = {'csp-report': {'document-uri': 'http://protected.example.cz/',
                                'referrer': 'http://referrer.example.cz/',
                                'blocked-uri': 'http://dangerous.example.cz/',
@@ -201,7 +201,7 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
-        self.assertTrue(report.is_valid)
+        self.assertFalse(report.is_valid)
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
