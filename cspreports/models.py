@@ -1,7 +1,8 @@
 # STANDARD LIB
 import json
 
-from django.db import connection, models
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
@@ -11,7 +12,7 @@ DISPOSITIONS = (
 )
 
 # Map of required CSP report fields to model fields
-REQUIRED_FIELD_MAP = (
+REQUIRED_FIELDS = (
     ('document-uri', 'document_uri'),
     ('referrer', 'referrer'),
     ('blocked-uri', 'blocked_uri'),
@@ -19,12 +20,10 @@ REQUIRED_FIELD_MAP = (
     ('original-policy', 'original_policy'),
 )
 # Map of optional (CSP >= 2.0) CSP report fields to model fields
-OPTIONAL_FIELD_MAP = (
+OPTIONAL_FIELDS = (
+    ('disposition', 'disposition'),
     ('effective-directive', 'effective_directive'),
     ('source-file', 'source_file'),
-)
-# Map of optional report fields with integer values.
-INTEGER_FIELD_MAP = (
     ('status-code', 'status_code'),
     ('line-number', 'line_number'),
     ('column-number', 'column_number'),
@@ -118,29 +117,20 @@ class CSPReport(models.Model):
             # Message is not a valid CSP report. Return as invalid.
             return self
 
-        # Extract individual fields
-        for report_name, field_name in REQUIRED_FIELD_MAP + OPTIONAL_FIELD_MAP:
-            setattr(self, field_name, report_data.get(report_name))
-        # Extract integer fields
-        for report_name, field_name in INTEGER_FIELD_MAP:
-            value = report_data.get(report_name)
-            field = self._meta.get_field(field_name)
-            min_value, max_value = connection.ops.integer_field_range(field.get_internal_type())
-            if min_value is None:
-                min_value = 0
-            # All these fields are possitive. Value can't be negative.
-            min_value = max(min_value, 0)
-            if value is not None and min_value <= value and (max_value is None or value <= max_value):
-                setattr(self, field_name, value)
-        # Extract disposition
-        disposition = report_data.get('disposition')
-        if disposition in dict(DISPOSITIONS).keys():
-            self.disposition = disposition
+        fields = REQUIRED_FIELDS + OPTIONAL_FIELDS
+        for json_field_name, django_field_name in fields:
+            converter = cls._meta.get_field(django_field_name).to_python
+            try:
+                value = converter(report_data.get(json_field_name))
+                setattr(self, django_field_name, value)
+            except ValidationError:
+                pass
 
-        # Check if report is valid
+        # validate report
         is_valid = True
-        for field_name in dict(REQUIRED_FIELD_MAP).values():
-            if getattr(self, field_name) is None:
+        for field, django_field_name in REQUIRED_FIELDS:
+            model_field = getattr(self, django_field_name)
+            if model_field is None:
                 is_valid = False
                 break
         self.is_valid = is_valid

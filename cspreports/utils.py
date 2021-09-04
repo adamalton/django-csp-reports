@@ -57,6 +57,7 @@ def save_report(request):
     message = request.body
     if isinstance(message, bytes):
         message = message.decode(request.encoding or settings.DEFAULT_CHARSET)
+
     report = CSPReport.from_message(message)
     report.user_agent = request.META.get('HTTP_USER_AGENT', '')
     report.save()
