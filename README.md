@@ -40,8 +40,9 @@ Python 2.7 support is available in version 1.4 and/or the `python2.7-support` br
     * `CSP_REPORTS_ADDITIONAL_HANDLERS` (`iterable` defaults to `[]`).
       - Each value should be a dot-separated string path to a function which you want be called when a report is received.
       - Each function is passed the `HttpRequest` of the CSP report.
-      - You may want to use the supplied `"cspreports.filters.filter_browser_extensions"` as a starting point.
-    * `CSP_REPORTS_FILTER_FUNCTION` (`str` of dotted path to a callable, defaults to `None`). If set, the specificed function is passed each `HttpRequest` object of the CSP report before it's processed. Only requests for which the function returns `True` are processed. See [Filtering Requests](#filtering-requests) below.
+    * `CSP_REPORTS_FILTER_FUNCTION` (`str` of dotted path to a callable, defaults to `None`).
+      - If set, the specificed function is passed each `HttpRequest` object of the CSP report before it's processed. Only requests for which the function returns `True` are processed.
+      - You may want to set this to `"cspreports.filters.filter_browser_extensions"` as a starting point.
     * `CSP_REPORTS_LOGGER_NAME` (`str` defaults to `CSP Reports`). Specifies the logger name that will be used for logging CSP reports, if enabled.
 6. Set a cron to generate summaries.
 7. Enjoy.
@@ -69,34 +70,3 @@ Options:
 * `--since` - timestamp of the oldest reports to include.  Accepts any string that can be parsed as a datetime.
 * `--to` - timestamp of the newest reports to include.  Accepts any string that can be parsed as a datetime.
 * `--top` - limit of how many examples to show. Default is 10.
-
-
-### Filtering Requests
-
-If you want to filter out some CSP reports (e.g. reports caused by browser extensions trying to inject scripts into the page), you can do so using the `CSP_REPORTS_FILTER_FUNCTION`.
-
-*Example*
-
-```python
-# settings.py
-CSP_REPORTS_FILTER_FUNCTION = 'myapp.utils.filter_csp_report'
-
-# myapp/utils.py
-import json
-
-def filter_csp_report(request):
-    report = json_str = request.body
-    if isinstance(json_str, bytes):
-        json_str = json_str.decode(request.encoding or 'utf-8')
-    report = json.loads(request.body)
-    src_file = report.get('csp-report', {}).get('source-file', '')
-    ignored_prefixes = (
-        'safari-extension://',
-        'safari-web-extension://',
-        'moz-extension://',
-        'chrome-extension://',
-    )
-    if any(src_file.startswith(prefix) for prefix in ignored_prefixes):
-        return False
-    return True
-```
