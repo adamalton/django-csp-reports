@@ -119,9 +119,18 @@ class CSPReport(models.Model):
 
         fields = REQUIRED_FIELDS + OPTIONAL_FIELDS
         for json_field_name, django_field_name in fields:
-            converter = cls._meta.get_field(django_field_name).to_python
+            value = report_data.get(json_field_name)
+            # Try to pass the value through as much of Django's coercion/cleaning as possible, but
+            # if the data is not entirely valid, that's not a reason to not still save the report
+            # if we can; even if the data isn't perfect, some information is better than none.
+            to_python = cls._meta.get_field(django_field_name).to_python
+            clean = cls._meta.get_field(django_field_name).clean
             try:
-                value = converter(report_data.get(json_field_name))
+                value = to_python(value)
+                # If the first conversion step worked, then store the value here, even if the next
+                # conversion fails
+                setattr(self, django_field_name, value)
+                value = clean(value, model_instance=self)
                 setattr(self, django_field_name, value)
             except ValidationError:
                 pass
