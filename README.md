@@ -37,7 +37,10 @@ Python 2.7 support is available in version 1.4 and/or the `python2.7-support` br
     * `CSP_REPORTS_LOG` (`bool`, whether or not to log the reporting using the python `logging` module, defaults to `True`).
     * `CSP_REPORTS_LOG_LEVEL` (`str`, one of the Python logging module's available log functions, defaults to `'warning'`).
     * `CSP_REPORTS_SAVE` (`bool` defaults to `True`).  Determines whether the reports are saved to the database.
-    * `CSP_REPORTS_ADDITIONAL_HANDLERS` (`iterable` defaults to `[]`). Each value should be a dot-separated string path to a function which you want be called when a report is received. Each function is passed the `HttpRequest` of the CSP report.
+    * `CSP_REPORTS_ADDITIONAL_HANDLERS` (`iterable` defaults to `[]`).
+      - Each value should be a dot-separated string path to a function which you want be called when a report is received.
+      - Each function is passed the `HttpRequest` of the CSP report.
+      - You may want to use the supplied `"cspreports.filters.filter_browser_extensions"` as a starting point.
     * `CSP_REPORTS_FILTER_FUNCTION` (`str` of dotted path to a callable, defaults to `None`). If set, the specificed function is passed each `HttpRequest` object of the CSP report before it's processed. Only requests for which the function returns `True` are processed. See [Filtering Requests](#filtering-requests) below.
     * `CSP_REPORTS_LOGGER_NAME` (`str` defaults to `CSP Reports`). Specifies the logger name that will be used for logging CSP reports, if enabled.
 6. Set a cron to generate summaries.
