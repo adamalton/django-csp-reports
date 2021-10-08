@@ -11,7 +11,7 @@ Violation sources
 {% for info in sources %}
 {{ info.root_uri }}: {{ info.count }}
 ----------------------------------------
-{% for example in info.examples %}{ example|safe }}
+{% for example in info.examples %}{{ example|safe }}
 {% endfor %}
 {% endfor %}
 {% endif %}
