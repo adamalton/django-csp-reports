@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 DISPOSITIONS = (
     ('enforce', 'enforce'),
@@ -60,6 +61,7 @@ class CSPReport(models.Model):
     """
 
     class Meta:
+        verbose_name = _('CSP report')
         ordering = ('-created',)
 
     created = models.DateTimeField(auto_now_add=True)
