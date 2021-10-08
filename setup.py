@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from setuptools import find_packages, setup
 
+VERSION = "1.6"
+
 PACKAGES = find_packages()
 REQUIREMENTS = ['django >=1.11,<4.0']
 TEST_REQUIREMENTS = ['coverage']
@@ -27,13 +29,13 @@ DESCRIPTION = (
 
 setup(
     name='django-csp-reports',
-    version='1.5',
+    version='%s' % VERSION,
     description=DESCRIPTION,
     long_description=DESCRIPTION,
     author='Adam Alton',
     author_email='adamalton@gmail.com',
     url='https://github.com/adamalton/django-csp-reports',
-    download_url='https://github.com/adamalton/django-csp-reports/tarball/1.5',
+    download_url='https://github.com/adamalton/django-csp-reports/tarball/%s' % VERSION,
     packages=PACKAGES,
     include_package_data=True,
     python_requires='>=3.4',
