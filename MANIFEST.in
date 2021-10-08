@@ -1,2 +1,4 @@
 include cspreports/*.py
+include cspreports/templates/cspreports/*
 prune cspreports/tests/
+global-exclude *.DS_Store
