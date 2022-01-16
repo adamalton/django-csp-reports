@@ -2,7 +2,7 @@
 from datetime import timedelta
 
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from cspreports.models import CSPReport
 from cspreports.utils import get_midnight, parse_date_input
@@ -27,7 +27,7 @@ class Command(BaseCommand):
             try:
                 limit = parse_date_input(limit)
             except ValueError as err:
-                raise CommandError(force_text(err))
+                raise CommandError(force_str(err))
         else:
             limit = get_midnight() - timedelta(days=DEFAULT_OFFSET)
 
