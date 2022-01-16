@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 VERSION = "1.6"
 
 PACKAGES = find_packages()
-REQUIREMENTS = ['django >=1.11,<4.0']
+REQUIREMENTS = ['django >=2.2,<5.0']
 TEST_REQUIREMENTS = ['coverage']
 EXTRAS_REQUIRE = {
     'quality': ['isort', 'flake8'],
@@ -19,7 +19,9 @@ CLASSIFIERS = ['License :: OSI Approved :: MIT License',
                'Programming Language :: Python :: 3.5',
                'Programming Language :: Python :: 3.6',
                'Programming Language :: Python :: 3.7',
-               'Programming Language :: Python :: 3.8']
+               'Programming Language :: Python :: 3.8',
+               'Programming Language :: Python :: 3.9',
+               'Programming Language :: Python :: 3.10']
 
 
 DESCRIPTION = (

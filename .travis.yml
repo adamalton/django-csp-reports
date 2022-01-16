@@ -2,11 +2,12 @@ dist: xenial
 language: python
 sudo: false
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
+  - "3.10"
 
 install:
   # tox-travis automatically splits the jobs

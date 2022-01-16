@@ -2,7 +2,7 @@
 from datetime import timedelta
 
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from cspreports.summary import DEFAULT_TOP, collect
 from cspreports.utils import get_midnight, parse_date_input
@@ -14,7 +14,7 @@ def _parse_date_input(date_input, default_offset=0):
         try:
             return parse_date_input(date_input)
         except ValueError as err:
-            raise CommandError(force_text(err))
+            raise CommandError(force_str(err))
     else:
         return get_midnight() - timedelta(days=default_offset)
 
