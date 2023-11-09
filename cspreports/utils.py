@@ -9,21 +9,22 @@ from django.utils.dateparse import parse_date
 from django.utils.timezone import localtime, make_aware, now
 
 from cspreports.models import CSPReport
+from cspreports.conf import app_settings
 
-logger = logging.getLogger(getattr(settings, "CSP_REPORTS_LOGGER_NAME", "CSP Reports"))
+logger = logging.getLogger(app_settings.LOGGER_NAME)
 
 
 def process_report(request):
     """ Given the HTTP request of a CSP violation report, log it in the required ways. """
     if not should_process_report(request):
         return
-    if config.EMAIL_ADMINS:
+    if app_settings.EMAIL_ADMINS:
         email_admins(request)
-    if config.LOG:
+    if app_settings.LOG:
         log_report(request)
-    if config.SAVE:
+    if app_settings.SAVE:
         save_report(request)
-    if config.ADDITIONAL_HANDLERS:
+    if app_settings.ADDITIONAL_HANDLERS:
         run_additional_handlers(request)
 
 
@@ -49,7 +50,7 @@ def email_admins(request):
 
 
 def log_report(request):
-    func = getattr(logger, config.LOG_LEVEL)
+    func = getattr(logger, app_settings.LOG_LEVEL)
     func("Content Security Policy violation: %s", format_report(request.body))
 
 
@@ -68,25 +69,6 @@ def run_additional_handlers(request):
         handler(request)
 
 
-class Config:
-    """ Configuration with defaults, each of which is overrideable in django settings. """
-
-    # Defaults, these are overridden using "CSP_REPORTS_"-prefixed versions in settings.py
-    EMAIL_ADMINS = True
-    LOG = True
-    LOG_LEVEL = 'warning'
-    SAVE = True
-    ADDITIONAL_HANDLERS = []
-    FILTER_FUNCTION = None
-
-    def __getattribute__(self, name):
-        try:
-            return getattr(settings, "%s%s" % ("CSP_REPORTS_", name))
-        except AttributeError:
-            return super().__getattribute__(name)
-
-
-config = Config()
 _additional_handlers = None
 _filter_function = None
 
@@ -96,7 +78,7 @@ def get_additional_handlers():
     global _additional_handlers
     if not isinstance(_additional_handlers, list):
         handlers = []
-        for name in config.ADDITIONAL_HANDLERS:
+        for name in app_settings.ADDITIONAL_HANDLERS:
             function = import_from_dotted_path(name)
             handlers.append(function)
         _additional_handlers = handlers
@@ -140,9 +122,9 @@ def import_from_dotted_path(name):
 
 
 def should_process_report(request):
-    if not config.FILTER_FUNCTION:
+    if not app_settings.FILTER_FUNCTION:
         return True
     global _filter_function
     if _filter_function is None:
-        _filter_function = import_from_dotted_path(config.FILTER_FUNCTION)
+        _filter_function = import_from_dotted_path(app_settings.FILTER_FUNCTION)
     return _filter_function(request)
