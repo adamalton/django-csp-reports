@@ -1,10 +1,13 @@
 # STANDARD LIB
 import json
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
+from django.apps import apps
+
+from cspreports.conf import app_settings
 
 DISPOSITIONS = (
     ('enforce', 'enforce'),
@@ -30,7 +33,7 @@ OPTIONAL_FIELDS = (
 )
 
 
-class CSPReport(models.Model):
+class CSPReportBase(models.Model):
     """Represents a CSP violation report.
 
     @ivar created: Date and time of report creation.
@@ -61,6 +64,7 @@ class CSPReport(models.Model):
 
     class Meta:
         ordering = ('-created',)
+        abstract = True
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -170,3 +174,22 @@ class CSPReport(models.Model):
 
         formatted_json = utils.format_report(self.json)
         return mark_safe("<pre>\n%s</pre>" % escape(formatted_json))
+
+
+class CSPReport(CSPReportBase):
+    pass
+
+
+def get_report_model():
+    model_string = app_settings.CSP_REPORT_MODEL
+    try:
+        return apps.get_model(model_string, require_ready=False)
+    except ValueError:
+        raise ImproperlyConfigured(
+            "CSP_REPORTS_MODEL must be of the form 'app_label.model_name'"
+        )
+    except LookupError:
+        raise ImproperlyConfigured(
+            "CSP_REPORTS_MODEL refers to model '%s' that has not been installed"
+            % model_string
+        )

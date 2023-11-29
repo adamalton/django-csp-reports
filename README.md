@@ -44,6 +44,22 @@ Python 2.7 support is available in version 1.4 and/or the `python2.7-support` br
       - If set, the specificed function is passed each `HttpRequest` object of the CSP report before it's processed. Only requests for which the function returns `True` are processed.
       - You may want to set this to `"cspreports.filters.filter_browser_extensions"` as a starting point.
     * `CSP_REPORTS_LOGGER_NAME` (`str` defaults to `CSP Reports`). Specifies the logger name that will be used for logging CSP reports, if enabled.
+    * `CSP_REPORTS_MODEL` (`<app_label>.<model_name>` defaults to `"cspreports.CSPReport"`). Specifies the model to be used for storing the CSP reports. You can easily extend the model by implementing the abstract base class `cspreports.models.CSPReportBase` and adding your additional fields to it:
+
+      ```python
+      # your_app.model.py
+      from cspreports.models import CSPReportBase
+
+      class CustomCSPReport(CSPReportBase):
+          # Add your fields here
+          pass
+      ```
+
+      ```python
+      # settings.py
+
+      CSP_REPORTS_MODEL = "your_app.CustomCSPReport"
+      ```
 6. Set a cron to generate summaries.
 7. Enjoy.
 

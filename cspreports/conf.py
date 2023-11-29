@@ -34,5 +34,9 @@ class Settings:
     def FILTER_FUNCTION(self):
         return getattr(settings, "CSP_REPORTS_FILTER_FUNCTION", None)
 
+    @property
+    def CSP_REPORT_MODEL(self):
+        return getattr(settings, "CSP_REPORTS_MODEL", "cspreports.CSPReport")
+
 
 app_settings = Settings()

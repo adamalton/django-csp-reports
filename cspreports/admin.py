@@ -1,6 +1,9 @@
 from django.contrib import admin
 
-from cspreports.models import CSPReport
+from cspreports.models import get_report_model
+
+
+CSPReport = get_report_model()
 
 
 class CSPReportAdmin(admin.ModelAdmin):

@@ -3,6 +3,7 @@ SECRET_KEY = 'CSP_REPORTS_TESTS'
 
 INSTALLED_APPS = [
     'cspreports',
+    'cspreports.tests',
 ]
 
 DATABASES = {
@@ -18,3 +19,5 @@ TEMPLATES = [
         'APP_DIRS': True,
     },
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
