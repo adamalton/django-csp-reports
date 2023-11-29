@@ -4,8 +4,10 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django.template.loader import get_template
 
-from cspreports.models import CSPReport
+from cspreports.models import get_report_model
 
+
+CSPReport = get_report_model()
 DEFAULT_TOP = 10
 
 

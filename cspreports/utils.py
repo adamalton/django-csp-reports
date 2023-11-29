@@ -8,8 +8,10 @@ from django.core.mail import mail_admins
 from django.utils.dateparse import parse_date
 from django.utils.timezone import localtime, make_aware, now
 
-from cspreports.models import CSPReport
+from cspreports.models import get_report_model
 from cspreports.conf import app_settings
+
+CSPReport = get_report_model()
 
 logger = logging.getLogger(app_settings.LOGGER_NAME)
 

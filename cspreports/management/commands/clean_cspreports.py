@@ -4,8 +4,10 @@ from datetime import timedelta
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.encoding import force_str
 
-from cspreports.models import CSPReport
+from cspreports.models import get_report_model
 from cspreports.utils import get_midnight, parse_date_input
+
+CSPReport = get_report_model()
 
 DEFAULT_OFFSET = 7
 
