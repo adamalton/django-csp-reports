@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from setuptools import find_packages, setup
 
-VERSION = "1.8.1"
+VERSION = "1.9.0"
 
 PACKAGES = find_packages()
 REQUIREMENTS = ['django >=2.2,<5.0']
