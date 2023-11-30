@@ -1,0 +1,36 @@
+name: Publish package to PyPI
+
+# Publishes to PyPI whenever a tag in the format "vX.X.X" is pushed.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-publish:
+    name: Build package and publish to PyPI
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install pypa/setuptools
+      run: >-
+        python -m
+        pip install wheel
+    - name: Get version from tag name
+      id: tag
+      run: echo ::set-output name=TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3)
+    - name: Update version in setup.py
+      run: >-
+        sed -i "s/{{VERSION_PLACEHOLDER}}/${{ steps.tag.outputs.TAG_NAME }}/g" setup.py
+    - name: Build a binary wheel
+      run: >-
+        python setup.py sdist bdist_wheel
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}

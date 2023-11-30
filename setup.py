@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from setuptools import find_packages, setup
-
-VERSION = "1.9.0"
+import os
 
 PACKAGES = find_packages()
 REQUIREMENTS = ['django >=2.2,<5.0']
@@ -21,23 +20,25 @@ CLASSIFIERS = ['License :: OSI Approved :: MIT License',
                'Programming Language :: Python :: 3.7',
                'Programming Language :: Python :: 3.8',
                'Programming Language :: Python :: 3.9',
-               'Programming Language :: Python :: 3.10']
+               'Programming Language :: Python :: 3.10',
+               'Programming Language :: Python :: 3.11']
 
 
 DESCRIPTION = (
     "A Django app for handling reports from web browsers of violations of your website's "
     "HTTP Content Security Policy."
 )
+LONG_DESCRIPTION = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
 
 setup(
     name='django-csp-reports',
-    version='%s' % VERSION,
+    version="{{VERSION_PLACEHOLDER}}",
     description=DESCRIPTION,
-    long_description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type="text/markdown",
     author='Adam Alton',
     author_email='adamalton@gmail.com',
     url='https://github.com/adamalton/django-csp-reports',
-    download_url='https://github.com/adamalton/django-csp-reports/tarball/%s' % VERSION,
     packages=PACKAGES,
     include_package_data=True,
     python_requires='>=3.4',
