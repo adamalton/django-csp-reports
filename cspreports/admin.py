@@ -7,9 +7,12 @@ CSPReport = get_report_model()
 
 
 class CSPReportAdmin(admin.ModelAdmin):
-    list_display = ('id', 'created', 'document_uri', 'blocked_uri')
+    list_display = ('id', 'created', 'document_uri', 'blocked_uri', 'is_valid')
     fields = ('created', 'modified', 'json_as_html')
     readonly_fields = ('created', 'modified', 'json_as_html')
+    search_fields = ('json',)
+    list_filter = ('is_valid',)
+    date_hierarchy = 'created'
 
     def json_as_html(self, instance):
         return "<br />" + instance.json_as_html()
