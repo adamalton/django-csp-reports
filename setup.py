@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 import os
 
 PACKAGES = find_packages()
-REQUIREMENTS = ['django >=2.2,<5.0']
+REQUIREMENTS = ['django >=2.2,<5.3']
 TEST_REQUIREMENTS = ['coverage']
 EXTRAS_REQUIRE = {
     'quality': ['isort', 'flake8'],
