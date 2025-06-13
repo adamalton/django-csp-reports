@@ -31,7 +31,7 @@ DESCRIPTION = (
 LONG_DESCRIPTION = open(os.path.join(os.path.dirname(__file__), "README.md")).read()
 
 VERSION = "{{VERSION_PLACEHOLDER}}"
-if not re.match(r"^\d+\.\d+\.\d+$", VERSION):
+if not re.match(r"^v\d+\.\d+\.\d+$", VERSION):
     # In tests, where we haven't replaced the version placeholder, just use a default version
     VERSION = "1.0.0"
 
