@@ -8,8 +8,8 @@ from django.core.mail import mail_admins
 from django.utils.dateparse import parse_date
 from django.utils.timezone import localtime, make_aware, now
 
-from cspreports.models import get_report_model
 from cspreports.conf import app_settings
+from cspreports.models import get_report_model
 
 CSPReport = get_report_model()
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(app_settings.LOGGER_NAME)
 
 
 def process_report(request):
-    """ Given the HTTP request of a CSP violation report, log it in the required ways. """
+    """Given the HTTP request of a CSP violation report, log it in the required ways."""
     if not should_process_report(request):
         return
     if app_settings.EMAIL_ADMINS:
@@ -31,21 +31,21 @@ def process_report(request):
 
 
 def format_report(jsn):
-    """ Given a JSON report, return a nicely formatted (i.e. with indentation) string.
-        This should handle invalid JSON (as the JSON comes from the browser/user).
-        We trust that Python's json library is secure, but if the JSON is invalid then we still
-        want to be able to display it, rather than tripping up on a ValueError.
+    """Given a JSON report, return a nicely formatted (i.e. with indentation) string.
+    This should handle invalid JSON (as the JSON comes from the browser/user).
+    We trust that Python's json library is secure, but if the JSON is invalid then we still
+    want to be able to display it, rather than tripping up on a ValueError.
     """
     if isinstance(jsn, bytes):
-        jsn = jsn.decode('utf-8')
+        jsn = jsn.decode("utf-8")
     try:
-        return json.dumps(json.loads(jsn), indent=4, sort_keys=True, separators=(',', ': '))
+        return json.dumps(json.loads(jsn), indent=4, sort_keys=True, separators=(",", ": "))
     except ValueError:
         return "Invalid JSON. Raw dump is below.\n\n" + jsn
 
 
 def email_admins(request):
-    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    user_agent = request.META.get("HTTP_USER_AGENT", "")
     report = format_report(request.body)
     message = "User agent:\n%s\n\nReport:\n%s" % (user_agent, report)
     mail_admins("CSP Violation Report", message)
@@ -62,7 +62,7 @@ def save_report(request):
         message = message.decode(request.encoding or settings.DEFAULT_CHARSET)
 
     report = CSPReport.from_message(message)
-    report.user_agent = request.META.get('HTTP_USER_AGENT', '')
+    report.user_agent = request.META.get("HTTP_USER_AGENT", "")
     report.save()
 
 
@@ -76,7 +76,7 @@ _filter_function = None
 
 
 def get_additional_handlers():
-    """ Returns the actual functions from the dotted paths specified in ADDITIONAL_HANDLERS. """
+    """Returns the actual functions from the dotted paths specified in ADDITIONAL_HANDLERS."""
     global _additional_handlers
     if not isinstance(_additional_handlers, list):
         handlers = []
@@ -119,7 +119,7 @@ def get_midnight():
 
 
 def import_from_dotted_path(name):
-    module_name, function_name = name.rsplit('.', 1)
+    module_name, function_name = name.rsplit(".", 1)
     return getattr(import_module(module_name), function_name)
 
 

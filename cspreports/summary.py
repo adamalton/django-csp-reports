@@ -1,11 +1,11 @@
 """Collect summary of CSP reports."""
+
 from operator import attrgetter
 from urllib.parse import urlsplit, urlunsplit
 
 from django.template.loader import get_template
 
 from cspreports.models import get_report_model
-
 
 CSPReport = get_report_model()
 DEFAULT_TOP = 10
@@ -14,7 +14,7 @@ DEFAULT_TOP = 10
 def get_root_uri(uri):
     """Return root URI - strip query and fragment."""
     chunks = urlsplit(uri)
-    return urlunsplit((chunks.scheme, chunks.netloc, chunks.path, '', ''))
+    return urlunsplit((chunks.scheme, chunks.netloc, chunks.path, "", ""))
 
 
 class ViolationInfo:
@@ -72,7 +72,7 @@ class CspReportSummary:
 
     def render(self):
         """Render the summary."""
-        template = get_template('cspreports/summary.txt')
+        template = get_template("cspreports/summary.txt")
         return template.render(self.__dict__)
 
 
@@ -95,7 +95,7 @@ def collect(since, to, top=DEFAULT_TOP):
         root_uri = get_root_uri(report.document_uri)
         info = sources.setdefault(root_uri, ViolationInfo(root_uri))
         info.append(report)
-    summary.sources = sorted(sources.values(), key=attrgetter('count'), reverse=True)[:top]
+    summary.sources = sorted(sources.values(), key=attrgetter("count"), reverse=True)[:top]
 
     # Collect blocks
     blocks = {}
@@ -103,7 +103,7 @@ def collect(since, to, top=DEFAULT_TOP):
         root_uri = get_root_uri(report.blocked_uri)
         info = blocks.setdefault(root_uri, ViolationInfo(root_uri))
         info.append(report)
-    summary.blocks = sorted(blocks.values(), key=attrgetter('count'), reverse=True)[:top]
+    summary.blocks = sorted(blocks.values(), key=attrgetter("count"), reverse=True)[:top]
 
     # Collect invalid reports
     summary.invalid_count = invalid_queryset.count()

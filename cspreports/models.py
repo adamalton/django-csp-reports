@@ -1,35 +1,37 @@
 # STANDARD LIB
 import json
 
+# Third party
+from django.apps import apps
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
-from django.apps import apps
 
+# CSP Reports
 from cspreports.conf import app_settings
 
 DISPOSITIONS = (
-    ('enforce', 'enforce'),
-    ('report', 'report'),
+    ("enforce", "enforce"),
+    ("report", "report"),
 )
 
 # Map of required CSP report fields to model fields
 REQUIRED_FIELDS = (
-    ('document-uri', 'document_uri'),
-    ('referrer', 'referrer'),
-    ('blocked-uri', 'blocked_uri'),
-    ('violated-directive', 'violated_directive'),
-    ('original-policy', 'original_policy'),
+    ("document-uri", "document_uri"),
+    ("referrer", "referrer"),
+    ("blocked-uri", "blocked_uri"),
+    ("violated-directive", "violated_directive"),
+    ("original-policy", "original_policy"),
 )
 # Map of optional (CSP >= 2.0) CSP report fields to model fields
 OPTIONAL_FIELDS = (
-    ('disposition', 'disposition'),
-    ('effective-directive', 'effective_directive'),
-    ('source-file', 'source_file'),
-    ('status-code', 'status_code'),
-    ('line-number', 'line_number'),
-    ('column-number', 'column_number'),
+    ("disposition", "disposition"),
+    ("effective-directive", "effective_directive"),
+    ("source-file", "source_file"),
+    ("status-code", "status_code"),
+    ("line-number", "line_number"),
+    ("column-number", "column_number"),
 )
 
 
@@ -63,7 +65,7 @@ class CSPReportBase(models.Model):
     """
 
     class Meta:
-        ordering = ('-created',)
+        ordering = ("-created",)
         abstract = True
 
     created = models.DateTimeField(auto_now_add=True)
@@ -88,14 +90,14 @@ class CSPReportBase(models.Model):
     def nice_report(self):
         """Return a nicely formatted original report."""
         if not self.json:
-            return '[no CSP report data]'
+            return "[no CSP report data]"
         try:
             data = json.loads(self.json)
         except ValueError:
             return "Invalid CSP report: '{}'".format(self.json)
-        if 'csp-report' not in data:
-            return 'Invalid CSP report: ' + json.dumps(data, indent=4, sort_keys=True, separators=(',', ': '))
-        return json.dumps(data['csp-report'], indent=4, sort_keys=True, separators=(',', ': '))
+        if "csp-report" not in data:
+            return "Invalid CSP report: " + json.dumps(data, indent=4, sort_keys=True, separators=(",", ": "))
+        return json.dumps(data["csp-report"], indent=4, sort_keys=True, separators=(",", ": "))
 
     def __str__(self):
         return self.nice_report
@@ -116,7 +118,7 @@ class CSPReportBase(models.Model):
             # Message is not a valid JSON. Return as invalid.
             return self
         try:
-            report_data = decoded_data['csp-report']
+            report_data = decoded_data["csp-report"]
         except KeyError:
             # Message is not a valid CSP report. Return as invalid.
             return self
@@ -159,7 +161,7 @@ class CSPReportBase(models.Model):
 
     @property
     def data(self):
-        """ Returns self.json loaded as a python object. """
+        """Returns self.json loaded as a python object."""
         try:
             data = self._data
         except AttributeError:
@@ -167,7 +169,7 @@ class CSPReportBase(models.Model):
         return data
 
     def json_as_html(self):
-        """ Print out self.json in a nice way. """
+        """Print out self.json in a nice way."""
 
         # To avoid circular import
         from cspreports import utils
@@ -185,11 +187,6 @@ def get_report_model():
     try:
         return apps.get_model(model_string, require_ready=False)
     except ValueError:
-        raise ImproperlyConfigured(
-            "CSP_REPORTS_MODEL must be of the form 'app_label.model_name'"
-        )
+        raise ImproperlyConfigured("CSP_REPORTS_MODEL must be of the form 'app_label.model_name'")
     except LookupError:
-        raise ImproperlyConfigured(
-            "CSP_REPORTS_MODEL refers to model '%s' that has not been installed"
-            % model_string
-        )
+        raise ImproperlyConfigured("CSP_REPORTS_MODEL refers to model '%s' that has not been installed" % model_string)

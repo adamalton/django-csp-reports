@@ -1,10 +1,9 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
-from django.test.signals import setting_changed
 
-from cspreports.models import get_report_model
 from cspreports.conf import app_settings
+from cspreports.models import get_report_model
 from cspreports.tests.models import CustomCSPReport
 
 
