@@ -1,11 +1,11 @@
 """Test commands."""
+
 from datetime import datetime, timezone as dt_timezone
 from io import StringIO
 from unittest.mock import patch
 
 from django.core.management import CommandError, call_command
 from django.test import TestCase, override_settings
-from django.utils import timezone
 
 from cspreports.models import CSPReport
 
@@ -23,31 +23,33 @@ class TestCleanCspreports(TestCase):
 
     def test_empty(self):
         # Test case when there's nothing to clean
-        call_command('clean_cspreports')
+        call_command("clean_cspreports")
 
     def test_verbose(self):
         # Test verbose prints message
         buff = StringIO()
-        call_command('clean_cspreports', verbosity=2, stdout=buff)
-        self.assertIn('Deleted all reports ', buff.getvalue())
+        call_command("clean_cspreports", verbosity=2, stdout=buff)
+        self.assertIn("Deleted all reports ", buff.getvalue())
 
-    @override_settings(USE_TZ=True, TIME_ZONE='Europe/Prague')
+    @override_settings(USE_TZ=True, TIME_ZONE="Europe/Prague")
     def test_clean(self):
         # Test reports are cleaned correctly
         self.create_cspreport(datetime(2016, 4, 19, 21, 59, 59, tzinfo=dt_timezone.utc))
         self.create_cspreport(datetime(2016, 4, 19, 22, 0, 0, tzinfo=dt_timezone.utc))
         mock_now = datetime(2016, 4, 27, 0, 34, tzinfo=dt_timezone.utc)
-        with patch('cspreports.utils.now', return_value=mock_now):
-            call_command('clean_cspreports')
+        with patch("cspreports.utils.now", return_value=mock_now):
+            call_command("clean_cspreports")
 
-        self.assertQuerySetEqual(CSPReport.objects.values_list('created'),
-                                 [(datetime(2016, 4, 19, 22, 0, 0, tzinfo=dt_timezone.utc), )],
-                                 transform=tuple)
+        self.assertQuerySetEqual(
+            CSPReport.objects.values_list("created"),
+            [(datetime(2016, 4, 19, 22, 0, 0, tzinfo=dt_timezone.utc),)],
+            transform=tuple,
+        )
 
     def test_invalid(self):
         # Test invalid limit input
         with self.assertRaisesMessage(CommandError, "'JUNK' is not a valid date."):
-            call_command('clean_cspreports', 'JUNK')
+            call_command("clean_cspreports", "JUNK")
 
 
 class TestMakeCspSummary(TestCase):
@@ -55,27 +57,31 @@ class TestMakeCspSummary(TestCase):
 
     def test_empty(self):
         buff = StringIO()
-        call_command('make_csp_summary', stdout=buff)
-        self.assertIn('CSP report summary', buff.getvalue())
+        call_command("make_csp_summary", stdout=buff)
+        self.assertIn("CSP report summary", buff.getvalue())
 
     def test_report(self):
-        create_csp_report(datetime(1970, 1, 1, 12), is_valid=True, document_uri='http://example.cz/',
-                          blocked_uri='http://example.evil/')
+        create_csp_report(
+            datetime(1970, 1, 1, 12),
+            is_valid=True,
+            document_uri="http://example.cz/",
+            blocked_uri="http://example.evil/",
+        )
         buff = StringIO()
 
-        call_command('make_csp_summary', stdout=buff, since='1970-01-01')
+        call_command("make_csp_summary", stdout=buff, since="1970-01-01")
 
-        self.assertIn('CSP report summary', buff.getvalue())
-        self.assertIn('Violation sources', buff.getvalue())
-        self.assertIn('Blocked URIs', buff.getvalue())
-        self.assertIn('http://example.evil/', buff.getvalue())
+        self.assertIn("CSP report summary", buff.getvalue())
+        self.assertIn("Violation sources", buff.getvalue())
+        self.assertIn("Blocked URIs", buff.getvalue())
+        self.assertIn("http://example.evil/", buff.getvalue())
 
     def test_invalid_since(self):
         # Test invalid since value
         with self.assertRaisesMessage(CommandError, "'JUNK' is not a valid date."):
-            call_command('make_csp_summary', since='JUNK')
+            call_command("make_csp_summary", since="JUNK")
 
     def test_invalid_to(self):
         # Test invalid since to
         with self.assertRaisesMessage(CommandError, "'JUNK' is not a valid date."):
-            call_command('make_csp_summary', to='JUNK')
+            call_command("make_csp_summary", to="JUNK")
