@@ -1,6 +1,7 @@
 """Test for `cspreports.models`."""
 import json
 
+from django.db import connection
 from django.test import SimpleTestCase
 
 from cspreports.models import CSPReport
@@ -151,7 +152,7 @@ class TestFromMessage(SimpleTestCase):
         self.assertEqual(report.line_number, 666)
 
     def test_invalid_line_number(self):
-        # Test invalid line number is ignored.
+        # Test invalid line number is added to the report
         data = {'csp-report': {'document-uri': 'http://protected.example.cz/',
                                'referrer': 'http://referrer.example.cz/',
                                'blocked-uri': 'http://dangerous.example.cz/',
@@ -161,7 +162,15 @@ class TestFromMessage(SimpleTestCase):
         message = json.dumps(data)
         report = CSPReport.from_message(message)
 
-        self.assertTrue(report.is_valid)
+        # In django versions <5, the connection does not return an integer field range
+        # for PositiveIntegerField, so field validation can be either valid or invalid
+        # depending on this value
+        min_value, _ = connection.ops.integer_field_range(CSPReport._meta.get_field('line_number').get_internal_type())
+        if min_value is None or min_value < 0:
+            self.assertTrue(report.is_valid)
+        else:
+            self.assertFalse(report.is_valid)
+
         self.assertEqual(report.json, message)
         self.assertEqual(report.document_uri, 'http://protected.example.cz/')
         self.assertEqual(report.referrer, 'http://referrer.example.cz/')
