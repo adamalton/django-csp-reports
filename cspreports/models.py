@@ -3,7 +3,7 @@ import json
 
 # Third party
 from django.apps import apps
-from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
