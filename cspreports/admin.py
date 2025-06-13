@@ -12,7 +12,7 @@ class CSPReportAdmin(admin.ModelAdmin):
     readonly_fields = ('created', 'modified', 'json_as_html')
 
     def json_as_html(self, instance):
-        return "<br />" + instance.json_as_html()
+        return instance.json_as_html()
 
     def document_uri(self, instance):
         return instance.data.get('csp-report', {}).get('document-uri')
