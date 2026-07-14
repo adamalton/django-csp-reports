@@ -4,7 +4,7 @@ import os
 import re
 
 PACKAGES = find_packages()
-REQUIREMENTS = ["django >=3.2,<5.3"]
+REQUIREMENTS = ["django >=3.2,<7.0"]
 TEST_REQUIREMENTS = ["coverage"]
 EXTRAS_REQUIRE = {
     "quality": ["isort", "flake8"],
@@ -13,6 +13,7 @@ EXTRAS_REQUIRE = {
 CLASSIFIERS = [
     "License :: OSI Approved :: MIT License",
     "Framework :: Django",
+    "Framework :: Django :: 6.0",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
