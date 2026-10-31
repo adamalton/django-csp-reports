@@ -47,6 +47,42 @@ class UtilsTest(TestCase):
                         else:
                             self.assertFalse(mocked_object.called)
 
+    def test_oversize_report_is_dropped_before_any_handler(self):
+        """A report larger than CSP_REPORTS_MAX_BODY_SIZE must reach no handler."""
+        mock_paths = [
+            "cspreports.utils.email_admins",
+            "cspreports.utils.save_report",
+            "cspreports.utils.log_report",
+        ]
+        mocks = [patch(path) for path in mock_paths]
+        with override_settings(
+            CSP_REPORTS_MAX_BODY_SIZE=10,
+            CSP_REPORTS_EMAIL_ADMINS=True,
+            CSP_REPORTS_SAVE=True,
+            CSP_REPORTS_LOG=True,
+        ):
+            with mocks[0] as mocked_0, mocks[1] as mocked_1, mocks[2] as mocked_2:
+                request = HttpRequest()
+                request._body = b"x" * 100
+                utils.process_report(request)
+                self.assertFalse(mocked_0.called)
+                self.assertFalse(mocked_1.called)
+                self.assertFalse(mocked_2.called)
+
+    def test_report_at_size_limit_is_processed(self):
+        """A report exactly at the limit is not dropped."""
+        with override_settings(
+            CSP_REPORTS_EMAIL_ADMINS=True,
+            CSP_REPORTS_SAVE=False,
+            CSP_REPORTS_LOG=False,
+            CSP_REPORTS_MAX_BODY_SIZE=10,
+        ):
+            with patch("cspreports.utils.email_admins") as mocked_email:
+                request = HttpRequest()
+                request._body = b"x" * 10
+                utils.process_report(request)
+                self.assertTrue(mocked_email.called)
+
     @override_settings(CSP_REPORTS_LOG_LEVEL='warning')
     def test_log_report(self):
         """ Test that the `log_report` handler correctly logs at the right level. """

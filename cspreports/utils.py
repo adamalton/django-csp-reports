@@ -18,6 +18,24 @@ logger = logging.getLogger(app_settings.LOGGER_NAME)
 
 def process_report(request):
     """Given the HTTP request of a CSP violation report, log it in the required ways."""
+    # The endpoint is unauthenticated and the body comes from the reporter,
+    # so an unbounded body would be parsed, formatted, logged, emailed and
+    # saved by the handlers below. Drop oversized reports before any of that
+    # work happens. The view still answers 200, so a sender learns nothing
+    # from the drop. The limit is configurable via CSP_REPORTS_MAX_BODY_SIZE
+    # (bytes, default 65536); real CSP reports are far smaller than that.
+    max_body_size = app_settings.MAX_BODY_SIZE
+    if max_body_size is not None:
+        # Django's HttpRequest.body raises AttributeError for a request with no body/stream
+        body_size = len(getattr(request, "body", ""))
+        if body_size > max_body_size:
+            logger.warning(
+                "Content Security Policy violation report dropped: "
+                "body size %s exceeds limit %s",
+                body_size,
+                max_body_size,
+            )
+            return
     if not should_process_report(request):
         return
     if app_settings.EMAIL_ADMINS:
