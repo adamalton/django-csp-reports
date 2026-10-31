@@ -10,10 +10,10 @@ coverage:
 	python-coverage html -d htmlcov
 
 isort:
-	isort --recursive cspreports
+	isort cspreports
 
 check-isort:
-	isort --check-only --diff --recursive cspreports
+	isort --check-only --diff cspreports
 
 check-flake8:
 	flake8 --format=pylint cspreports
