@@ -4,7 +4,7 @@ import os
 import re
 
 PACKAGES = find_packages()
-REQUIREMENTS = ["django >=3.2,<7.0"]
+REQUIREMENTS = ["django >=4.2,<7.0"]
 TEST_REQUIREMENTS = ["coverage"]
 EXTRAS_REQUIRE = {
     "quality": ["isort", "flake8"],
@@ -17,12 +17,13 @@ CLASSIFIERS = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
 ]
 
 
@@ -47,7 +48,7 @@ setup(
     url="https://github.com/adamalton/django-csp-reports",
     packages=PACKAGES,
     include_package_data=True,
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     install_requires=REQUIREMENTS,
     tests_require=TEST_REQUIREMENTS,
     extras_require=EXTRAS_REQUIRE,
