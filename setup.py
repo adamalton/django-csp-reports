@@ -4,7 +4,7 @@ import os
 import re
 
 PACKAGES = find_packages()
-REQUIREMENTS = ["django >=3.2,<7.0"]
+REQUIREMENTS = ["django >=4.2,<7.0"]
 TEST_REQUIREMENTS = ["coverage"]
 EXTRAS_REQUIRE = {
     "quality": ["isort", "flake8"],
