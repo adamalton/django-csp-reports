@@ -37,6 +37,7 @@ The last version to support Python 2.7 was release 1.4 (or see the `python2.7-su
     * `CSP_REPORTS_LOG` (`bool`, whether or not to log the reporting using the python `logging` module, defaults to `True`).
     * `CSP_REPORTS_LOG_LEVEL` (`str`, one of the Python logging module's available log functions, defaults to `'warning'`).
     * `CSP_REPORTS_SAVE` (`bool` defaults to `True`).  Determines whether the reports are saved to the database.
+    * `CSP_REPORTS_MAX_BODY_SIZE` (`int`, maximum report body size in bytes, defaults to `65536`). Reports larger than this are dropped before any handler runs; the view still answers 200.
     * `CSP_REPORTS_ADDITIONAL_HANDLERS` (`iterable` defaults to `[]`).
       - Each value should be a dot-separated string path to a function which you want be called when a report is received.
       - Each function is passed the `HttpRequest` of the CSP report.

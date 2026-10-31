@@ -55,7 +55,12 @@ class UtilsTest(TestCase):
             "cspreports.utils.log_report",
         ]
         mocks = [patch(path) for path in mock_paths]
-        with override_settings(CSP_REPORTS_MAX_BODY_SIZE=10):
+        with override_settings(
+            CSP_REPORTS_MAX_BODY_SIZE=10,
+            CSP_REPORTS_EMAIL_ADMINS=True,
+            CSP_REPORTS_SAVE=True,
+            CSP_REPORTS_LOG=True,
+        ):
             with mocks[0] as mocked_0, mocks[1] as mocked_1, mocks[2] as mocked_2:
                 request = HttpRequest()
                 request._body = b"x" * 100

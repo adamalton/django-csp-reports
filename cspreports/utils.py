@@ -26,10 +26,7 @@ def process_report(request):
     # (bytes, default 65536); real CSP reports are far smaller than that.
     max_body_size = app_settings.MAX_BODY_SIZE
     if max_body_size is not None:
-        try:
-            body_size = len(request.body)
-        except Exception:
-            body_size = 0
+        body_size = len(request.body or "")
         if body_size > max_body_size:
             logger.warning(
                 "Content Security Policy violation report dropped: "
