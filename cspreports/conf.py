@@ -35,6 +35,10 @@ class Settings:
         return getattr(settings, "CSP_REPORTS_FILTER_FUNCTION", None)
 
     @property
+    def MAX_BODY_SIZE(self):
+        return getattr(settings, "CSP_REPORTS_MAX_BODY_SIZE", 65536)
+
+    @property
     def CSP_REPORT_MODEL(self):
         return getattr(settings, "CSP_REPORTS_MODEL", "cspreports.CSPReport")
 
