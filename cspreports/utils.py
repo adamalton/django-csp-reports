@@ -26,16 +26,8 @@ def process_report(request):
     # (bytes, default 65536); real CSP reports are far smaller than that.
     max_body_size = app_settings.MAX_BODY_SIZE
     if max_body_size is not None:
-        # Narrowed from a broad except: Django's HttpRequest.body raises
-        # AttributeError for a request with no body/stream (bare
-        # HttpRequest() in test_config/test_run_additional_handlers,
-        # verified on Django 6.1.2), and a None body is the other falsy
-        # case. No other exception is expected from request.body here.
-        try:
-            body = request.body
-        except AttributeError:
-            body = None
-        body_size = len(body or "")
+        # Django's HttpRequest.body raises AttributeError for a request with no body/stream
+        body_size = len(getattr(request, "body", ""))
         if body_size > max_body_size:
             logger.warning(
                 "Content Security Policy violation report dropped: "
